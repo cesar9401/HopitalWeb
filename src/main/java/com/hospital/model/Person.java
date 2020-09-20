@@ -5,17 +5,17 @@ package com.hospital.model;
  *
  * @author cesar31
  */
-public class Persona {
+public class Person {
     private String name;
     private String dpi;
     private String phone;
     private String email;
     private String pass;
 
-    public Persona() {
+    public Person() {
     }
 
-    public Persona(String name, String email, String pass) {
+    public Person(String name, String email, String pass) {
         this.name = name;
         this.email = email;
         this.pass = pass;
@@ -59,5 +59,10 @@ public class Persona {
 
     public void setPass(String pass) {
         this.pass = pass;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" + "name=" + name + ", email=" + email + ", pass=" + pass + '}';
     }
 }

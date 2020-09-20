@@ -8,7 +8,7 @@ import java.sql.*;
  * @author cesar31
  */
 public class Conexion {
-    private static final String URL = "jdbc:mysql://localhost:3306/hospital";
+    private static final String URL = "jdbc:mysql://localhost:3306/HOSPITAL";
     private static final String USER = "cesar31";
     private static final String PASS = "Huevos94C";
     
