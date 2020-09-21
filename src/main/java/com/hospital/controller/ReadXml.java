@@ -11,6 +11,7 @@ import com.hospital.model.Result;
 import com.hospital.model.Specialty;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,7 +27,13 @@ import org.jdom2.input.SAXBuilder;
  * @author cesar31
  */
 public class ReadXml {
+    
+    private InputStream input;
 
+    public ReadXml(InputStream input) {
+        this.input = input;
+    }
+    
     public void getAdministrators() {
         List<Administrator> admins = new ArrayList<>();
         List<Element> listE = getData("admin");
@@ -139,8 +146,8 @@ public class ReadXml {
         List<Element> elements = new ArrayList<>();
         try {
             SAXBuilder builder = new SAXBuilder();
-            File xml = new File("data.xml");
-            Document document = builder.build(xml);
+            //File xml = new File("data.xml");
+            Document document = builder.build(input);
             Element root = document.getRootElement();
             elements = root.getChildren(node);
 

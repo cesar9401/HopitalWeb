@@ -10,7 +10,7 @@ public class MainTest {
 
     public static void main(String[] args) {
         //Write your code here
-        ReadXml xml = new ReadXml();
+        //ReadXml xml = new ReadXml();
         //xml.getDoctors();
         //xml.getAdministrators();
         //xml.getLabWorkers();
@@ -19,6 +19,6 @@ public class MainTest {
         //xml.getReports();
         //xml.getResults();
         //xml.getAppointments();
-        xml.getSpecialties();
+        //xml.getSpecialties();
     }
 }
