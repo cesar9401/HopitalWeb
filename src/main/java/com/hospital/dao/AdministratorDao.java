@@ -1,6 +1,5 @@
 package com.hospital.dao;
 
-import com.hospital.conexion.Conexion;
 import com.hospital.model.Administrator;
 import com.hospital.model.Day;
 import java.sql.Connection;

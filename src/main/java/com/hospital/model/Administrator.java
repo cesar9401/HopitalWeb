@@ -1,6 +1,8 @@
 
 package com.hospital.model;
 
+import org.jdom2.Element;
+
 /**
  *
  * @author cesar31
@@ -12,6 +14,13 @@ public class Administrator {
     private String pass;
 
     public Administrator() {
+    }
+    
+    public Administrator(Element e) {
+        this.adminId = e.getChildText("CODIGO");
+        this.dpi = e.getChildText("DPI");
+        this.name = e.getChildText("NOMBRE");
+        this.pass = e.getChildText("PASSWORD");
     }
 
     public Administrator(String adminId, String dpi, String name, String pass) {

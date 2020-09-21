@@ -1,19 +1,30 @@
-
 package com.hospital.model;
 
+import com.hospital.controller.ReadXml;
 import java.sql.Date;
+import org.jdom2.Element;
 
 /**
  *
  * @author cesar31
  */
-public class Patient extends Person{
+public class Patient extends Person {
+
     private int patientId;
     private boolean gender;
     private Date birth;
     private Double weight;
     private String blood;
 
+    public Patient(Element e) {
+        super(e);
+        this.patientId = Integer.parseInt(e.getChildText("CODIGO"));
+        this.gender = e.getChildText("SEXO").equals("Hombre");
+        this.birth = ReadXml.getDate(e.getChildText("BIRTH"));
+        this.weight = Double.parseDouble(e.getChildText("PESO"));
+        this.blood = e.getChildText("SANGRE");
+    }
+    
     public Patient(int patientId, String name, String email, String pass) {
         super(name, email, pass);
         this.patientId = patientId;

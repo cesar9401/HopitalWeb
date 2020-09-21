@@ -1,11 +1,13 @@
-
 package com.hospital.model;
+
+import org.jdom2.Element;
 
 /**
  *
  * @author cesar31
  */
 public class Person {
+
     private String name;
     private String dpi;
     private String phone;
@@ -13,6 +15,15 @@ public class Person {
     private String pass;
 
     public Person() {
+    }
+
+    public Person(Element e) {
+        this.name = e.getChildText("NOMBRE");
+        this.dpi = e.getChildText("DPI");
+        this.phone = e.getChildText("TELEFONO");
+        this.email = e.getChildText("CORREO");
+        this.pass = e.getChildText("PASSWORD");
+
     }
 
     public Person(String name, String email, String pass) {

@@ -1,14 +1,16 @@
-
 package com.hospital.model;
 
+import com.hospital.controller.ReadXml;
 import java.sql.Date;
 import java.sql.Time;
+import org.jdom2.Element;
 
 /**
  *
  * @author cesar31
  */
 public class Report {
+
     private int reportId;
     private int appointmentId;
     private int patientId;
@@ -17,7 +19,13 @@ public class Report {
     private Date date;
     private Time time;
 
-    public Report() {
+    public Report(Element e) {
+        this.reportId = Integer.parseInt(e.getChildText("CODIGO"));
+        this.patientId = Integer.parseInt(e.getChildText("PACIENTE"));
+        this.doctorId = e.getChildText("MEDICO");
+        this.report = e.getChildText("INFORME");
+        this.date = ReadXml.getDate(e.getChildText("FECHA"));
+        this.time = ReadXml.getTime(e.getChildText("HORA"));
     }
 
     public Report(int reportId, int appointmentId, int patientId, Date date, Time time) {
@@ -83,6 +91,9 @@ public class Report {
     public void setTime(Time time) {
         this.time = time;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return "Report{" + "reportId=" + reportId + ", patientId=" + patientId + ", doctorId=" + doctorId + ", report=" + report + ", date=" + date + ", time=" + time + '}';
+    }
 }

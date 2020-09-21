@@ -1,14 +1,16 @@
-
 package com.hospital.model;
 
+import com.hospital.controller.ReadXml;
 import java.sql.Date;
 import java.sql.Time;
+import org.jdom2.Element;
 
 /**
  *
  * @author cesar31
  */
 public class Appointment {
+
     private int appointmentId;
     private int patientId;
     private String doctorId;
@@ -16,6 +18,14 @@ public class Appointment {
     private Date date;
     private Time time;
     private boolean status;
+
+    public Appointment(Element e) {
+        this.appointmentId = Integer.parseInt(e.getChildText("CODIGO"));
+        this.patientId = Integer.parseInt(e.getChildText("PACIENTE"));
+        this.doctorId = e.getChildText("MEDICO");
+        this.date = ReadXml.getDate(e.getChildText("FECHA"));
+        this.time = ReadXml.getTime(e.getChildText("HORA"));
+    }
 
     public Appointment(int appointmentId, int patientId, String doctorId, Date date, Time time) {
         this.appointmentId = appointmentId;

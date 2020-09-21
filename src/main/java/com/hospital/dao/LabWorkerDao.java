@@ -1,6 +1,6 @@
-
 package com.hospital.dao;
 
+import com.hospital.model.Day;
 import com.hospital.model.LabWorker;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,6 +11,7 @@ import java.sql.SQLException;
  * @author cesar31
  */
 public class LabWorkerDao {
+
     private Connection transaction;
 
     public LabWorkerDao() {
@@ -19,11 +20,11 @@ public class LabWorkerDao {
     public LabWorkerDao(Connection transaction) {
         this.transaction = transaction;
     }
-    
+
     public void insertLabWoker(LabWorker lab) {
         String query = "INSERT INTO LAB_WORKERS(lab_worker_id, name, registry_number, dpi, phone, email, start_date, password, exam_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
-        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+
+        try ( PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setString(1, lab.getLabWorkerId());
             pst.setString(2, lab.getName());
             pst.setString(3, lab.getRegistry());
@@ -38,4 +39,24 @@ public class LabWorkerDao {
             ex.printStackTrace(System.out);
         }
     }
+
+    /**
+     * Metodo para insertar los dias que trabajo un laboratorista
+     * 
+     * @param lab 
+     */
+    public void insertLabWorkersDays(LabWorker lab) {
+        String query = "INSERT INTO WORKER_DAYS(lab_worker_id, day_id) VALUES(?, ?)";
+        try ( PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            for(Day d : lab.getDays()) {
+                pst.setString(1, lab.getLabWorkerId());
+                pst.setInt(2, d.getDayId());
+                pst.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+
+    }
+
 }

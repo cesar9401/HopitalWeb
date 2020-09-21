@@ -6,8 +6,8 @@ package com.hospital.model;
  * @author cesar31
  */
 public enum Day {
-    LUNES("Lunes", 1), MARTES("Martes", 2), MIERCOLES("Miércoles", 3), JUEVES("Jueves", 4),
-    VIERNES("Viernes", 5), SABADO("Sabado", 6), DOMINGO("Domingo", 7);
+    Lunes("Lunes", 1), Martes("Martes", 2), Miercoles("Miercoles", 3), Jueves("Jueves", 4),
+    Viernes("Viernes", 5), Sabado("Sabado", 6), Domingo("Domingo", 7);
         
     private String day;
     private int dayId;
