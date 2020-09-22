@@ -1,5 +1,9 @@
 package com.hospital.controller;
 
+import com.hospital.conexion.Conexion;
+import com.hospital.dao.AdministratorDao;
+import com.hospital.dao.DoctorDao;
+import com.hospital.dao.SpecialtyDao;
 import com.hospital.model.Administrator;
 import com.hospital.model.Appointment;
 import com.hospital.model.Doctor;
@@ -9,14 +13,16 @@ import com.hospital.model.Patient;
 import com.hospital.model.Report;
 import com.hospital.model.Result;
 import com.hospital.model.Specialty;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.servlet.http.Part;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -28,10 +34,26 @@ import org.jdom2.input.SAXBuilder;
  */
 public class ReadXml {
     
-    private InputStream input;
+    private Part filePart;
+    private Connection conexion;
 
-    public ReadXml(InputStream input) {
-        this.input = input;
+    public ReadXml(Part filePart) {
+        this.filePart = filePart;
+        getConnection();
+    }
+    
+    private void getConnection() {
+        try {
+            this.conexion= Conexion.getConnection();
+        } catch (SQLException | ClassNotFoundException ex) {
+            ex.printStackTrace(System.out);
+        }
+    }
+    
+    public void laodData() {
+        getAdministrators();
+        getSpecialties();
+        getDoctors();
     }
     
     public void getAdministrators() {
@@ -41,7 +63,10 @@ public class ReadXml {
             admins.add(new Administrator(e));
         }
         
+        AdministratorDao dao = new AdministratorDao(conexion);
+        dao.insertDays();
         for(Administrator a : admins) {
+            dao.insertAdministrator(a);
             System.out.println(a.toString());
         }
     }
@@ -53,8 +78,18 @@ public class ReadXml {
             doctors.add(new Doctor(e));
         }
         
+        DoctorDao dao = new DoctorDao(conexion);
+        SpecialtyDao sDao = new SpecialtyDao(conexion);
+        
         for(Doctor d : doctors) {
+            dao.insertDoctor(d);
             System.out.println(d.toString());
+            for(Specialty s : d.getSpecialties()) {
+                Specialty tmp = new Specialty(s.getDegree());
+                tmp.setDoctorId(d.getDoctorId());
+                sDao.insertMedicalDegree(tmp);
+                System.out.println(tmp.toString());
+            }
         }
     }
     
@@ -131,14 +166,16 @@ public class ReadXml {
     }
     
     public void getSpecialties() {
-        List<Specialty> special = new ArrayList<>();
+        List<Specialty> specialties = new ArrayList<>();
         List<Element> listEl = getData("consulta");
         for(Element e: listEl) {
-            special.add(new Specialty(e));
+            specialties.add(new Specialty(e));
         }
         
-        for(Specialty c : special) {
-            System.out.println(c.toString());
+        SpecialtyDao dao = new SpecialtyDao(conexion);
+        for(Specialty s : specialties) {
+            dao.insertSpecialty(s);
+            System.out.println(s.toString());
         }
     }
     
@@ -147,6 +184,7 @@ public class ReadXml {
         try {
             SAXBuilder builder = new SAXBuilder();
             //File xml = new File("data.xml");
+            InputStream input = filePart.getInputStream();
             Document document = builder.build(input);
             Element root = document.getRootElement();
             elements = root.getChildren(node);

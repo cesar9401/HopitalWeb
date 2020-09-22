@@ -1,16 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.hospital.controller;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import com.hospital.conexion.Conexion;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -18,7 +15,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import sun.security.util.IOUtils;
 
 /**
  *
@@ -80,7 +76,7 @@ public class ControllerAdmin extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String action = request.getParameter("action");
         switch (action) {
             case "load":
@@ -92,10 +88,9 @@ public class ControllerAdmin extends HttpServlet {
     private void loadData(HttpServletRequest request, HttpServletResponse response) {
         try {
             Part filePart = request.getPart("file");
-            InputStream input = filePart.getInputStream();
+            ReadXml read = new ReadXml(filePart);
+            read.laodData();
 
-            ReadXml read = new ReadXml(input);
-            read.getAdministrators();
         } catch (IOException | ServletException ex) {
             ex.printStackTrace(System.out);
         }

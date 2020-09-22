@@ -12,7 +12,8 @@ public class Conexion {
     private static final String USER = "cesar31";
     private static final String PASS = "Huevos94C";
     
-    public static Connection getConnection() throws SQLException {
+    public static Connection getConnection() throws SQLException, ClassNotFoundException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
         return DriverManager.getConnection(URL, USER, PASS);
     }
     

@@ -25,11 +25,10 @@ public class SpecialtyDao {
      * @param s 
      */
     public void insertSpecialty(Specialty s) {
-        String query = "INSERT INTO SPECIALTIES(degree, price_consultation) VALUES(?, ?) ON DUPLICATE KEY UPDATE price_consultation = ?";
+        String query = "INSERT INTO SPECIALTIES(degree, price_consultation) VALUES(?, ?)";
         try ( PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setString(1, s.getDegree());
             pst.setDouble(2, s.getPriceConsultation());
-            pst.setDouble(3, s.getPriceConsultation());
             pst.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
