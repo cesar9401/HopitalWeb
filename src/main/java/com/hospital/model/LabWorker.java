@@ -2,6 +2,8 @@ package com.hospital.model;
 
 import com.hospital.controller.ReadXml;
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.jdom2.Element;
@@ -30,6 +32,14 @@ public class LabWorker extends Person {
             days.add(Day.valueOf(i.getText()));
         }
         this.startDate = ReadXml.getDate(e.getContent(17).getValue());
+    }
+    
+    public LabWorker(ResultSet rs) throws SQLException {
+        super(rs);
+        this.labWorkerId = rs.getString("lab_worker_id");
+        this.registry = rs.getString("registry_number");
+        this.startDate = rs.getDate("start_date");
+        this.examId = rs.getInt("exam_id");
     }
 
     public LabWorker(String labWorkerId, String name, String email, String pass) {

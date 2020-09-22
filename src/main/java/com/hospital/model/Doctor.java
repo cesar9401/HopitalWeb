@@ -2,6 +2,8 @@ package com.hospital.model;
 
 import com.hospital.controller.ReadXml;
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,15 @@ public class Doctor extends Person {
         this.startTime = ReadXml.getTime(ele.getChildText("INICIO"));
         this.endTime = ReadXml.getTime(ele.getChildText("FIN"));
         this.startDate = ReadXml.getDate(e.getChildText("TRABAJO"));
+    }
+    
+    public Doctor(ResultSet rs) throws SQLException{
+        super(rs);
+        this.doctorId = rs.getString("doctor_id");
+        this.collegiate = rs.getString("collegiate");
+        this.startTime = rs.getTime("start_time");
+        this.endTime = rs.getTime("end_time");
+        this.startDate = rs.getDate("start_date");
     }
 
     public Doctor(String doctorId, String name, String email, String pass) {

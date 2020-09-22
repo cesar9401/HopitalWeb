@@ -2,6 +2,8 @@ package com.hospital.model;
 
 import com.hospital.controller.ReadXml;
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import org.jdom2.Element;
 
 /**
@@ -23,6 +25,15 @@ public class Patient extends Person {
         this.birth = ReadXml.getDate(e.getChildText("BIRTH"));
         this.weight = Double.parseDouble(e.getChildText("PESO"));
         this.blood = e.getChildText("SANGRE");
+    }
+    
+    public Patient(ResultSet rs) throws SQLException {
+        super(rs);
+        this.patientId = rs.getInt("patient_id");
+        this.gender = rs.getBoolean("gender");
+        this.birth = rs.getDate("birth");
+        this.weight = rs.getDouble("weight");
+        this.blood = rs.getString("blood");
     }
     
     public Patient(int patientId, String name, String email, String pass) {

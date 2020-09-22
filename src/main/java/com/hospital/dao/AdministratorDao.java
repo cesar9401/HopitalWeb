@@ -38,6 +38,10 @@ public class AdministratorDao {
         }
     }
 
+    /**
+     * Metodo para insertar un nuevo administrador
+     * @param admin 
+     */
     public void insertAdministrator(Administrator admin) {
         String query = "INSERT INTO ADMINISTRATORS(admin_id, dpi, name, password) VALUES(?, ?, ?, ?)";
 
@@ -52,6 +56,12 @@ public class AdministratorDao {
         }
     }
 
+    /**
+     * Metodo para obtener un administrador segun su codigo y password
+     * @param adminId
+     * @param pass
+     * @return 
+     */
     public Administrator getAdminById(String adminId, String pass) {
         Administrator admin = null;
         String query = "SELECT * FROM ADMINISTRATORS WHERE admin_id = ? AND password = ?";

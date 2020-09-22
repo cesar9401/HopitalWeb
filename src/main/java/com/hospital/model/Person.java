@@ -1,5 +1,7 @@
 package com.hospital.model;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import org.jdom2.Element;
 
 /**
@@ -24,6 +26,14 @@ public class Person {
         this.email = e.getChildText("CORREO");
         this.pass = e.getChildText("PASSWORD");
 
+    }
+
+    public Person(ResultSet rs) throws SQLException {
+        this.name = rs.getNString("name");
+        this.dpi = rs.getString("dpi");
+        this.phone = rs.getString("phone");
+        this.email = rs.getString("email");
+        this.pass = rs.getString("password");
     }
 
     public Person(String name, String email, String pass) {
@@ -74,6 +84,6 @@ public class Person {
 
     @Override
     public String toString() {
-        return "Person{" + "name=" + name + ", email=" + email + ", pass=" + pass + '}';
+        return "Person{" + "name=" + name + ", dpi=" + dpi + ", phone=" + phone + ", email=" + email + ", pass=" + pass + '}';
     }
 }

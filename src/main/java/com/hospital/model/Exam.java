@@ -1,5 +1,7 @@
 package com.hospital.model;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import org.jdom2.Element;
 
 /**
@@ -29,6 +31,15 @@ public class Exam {
         this.name = name;
         this.order = order;
         this.price = price;
+    }
+    
+    public Exam(ResultSet rs) throws SQLException {
+        this.examId = rs.getInt("exam_id");
+        this.name = rs.getString("name");
+        this.order = rs.getBoolean("exam_order");
+        this.description = rs.getString("description");
+        this.price = rs.getDouble("price");
+        this.report = rs.getBoolean("report");
     }
 
     public int getExamId() {
