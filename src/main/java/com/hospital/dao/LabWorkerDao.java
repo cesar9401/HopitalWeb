@@ -22,7 +22,8 @@ public class LabWorkerDao {
     }
 
     public void insertLabWoker(LabWorker lab) {
-        String query = "INSERT INTO LAB_WORKERS(lab_worker_id, name, registry_number, dpi, phone, email, start_date, password, exam_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO LAB_WORKERS(lab_worker_id, name, registry_number, dpi, phone, email, start_date, password, exam_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, "
+                + "(SELECT exam_id FROM EXAMS WHERE name = ? LIMIT 1))";
 
         try ( PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setString(1, lab.getLabWorkerId());
@@ -33,7 +34,7 @@ public class LabWorkerDao {
             pst.setString(6, lab.getEmail());
             pst.setDate(7, lab.getStartDate());
             pst.setString(8, lab.getPass());
-            pst.setInt(9, lab.getExamId());
+            pst.setString(9, lab.getExamName());
             pst.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
@@ -42,13 +43,13 @@ public class LabWorkerDao {
 
     /**
      * Metodo para insertar los dias que trabajo un laboratorista
-     * 
-     * @param lab 
+     *
+     * @param lab
      */
     public void insertLabWorkersDays(LabWorker lab) {
         String query = "INSERT INTO WORKER_DAYS(lab_worker_id, day_id) VALUES(?, ?)";
         try ( PreparedStatement pst = this.transaction.prepareStatement(query)) {
-            for(Day d : lab.getDays()) {
+            for (Day d : lab.getDays()) {
                 pst.setString(1, lab.getLabWorkerId());
                 pst.setInt(2, d.getDayId());
                 pst.executeUpdate();

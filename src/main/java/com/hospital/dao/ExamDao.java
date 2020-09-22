@@ -21,7 +21,7 @@ public class ExamDao {
     }
     
     public void insertExam(Exam e) {
-        String query = "INSERT INTO EXAMS(exam_id, name, order, description, price, report) VALUES(?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO EXAMS(exam_id, name, exam_order, description, price, report) VALUES(?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setInt(1, e.getExamId());
             pst.setString(2, e.getName());

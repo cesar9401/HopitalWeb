@@ -1,31 +1,14 @@
 package com.hospital.controller;
 
 import com.hospital.conexion.Conexion;
-import com.hospital.dao.AdministratorDao;
-import com.hospital.dao.DoctorDao;
-import com.hospital.dao.SpecialtyDao;
-import com.hospital.model.Administrator;
-import com.hospital.model.Appointment;
-import com.hospital.model.Doctor;
-import com.hospital.model.Exam;
-import com.hospital.model.LabWorker;
-import com.hospital.model.Patient;
-import com.hospital.model.Report;
-import com.hospital.model.Result;
-import com.hospital.model.Specialty;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.hospital.dao.*;
+import com.hospital.model.*;
+import java.io.*;
+import java.sql.*;
+import java.text.*;
+import java.util.*;
 import javax.servlet.http.Part;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
+import org.jdom2.*;
 import org.jdom2.input.SAXBuilder;
 
 /**
@@ -34,7 +17,7 @@ import org.jdom2.input.SAXBuilder;
  */
 public class ReadXml {
     
-    private Part filePart;
+    private final Part filePart;
     private Connection conexion;
 
     public ReadXml(Part filePart) {
@@ -54,6 +37,12 @@ public class ReadXml {
         getAdministrators();
         getSpecialties();
         getDoctors();
+        getExam();
+        getLabWorkers();
+        getPatients();
+        getReports();
+        getResults();
+        getAppointments();
     }
     
     public void getAdministrators() {
@@ -100,7 +89,10 @@ public class ReadXml {
             lab.add(new LabWorker(e));
         }
         
+        LabWorkerDao dao = new LabWorkerDao(conexion);
         for(LabWorker l : lab) {
+            dao.insertLabWoker(l);
+            dao.insertLabWorkersDays(l);
             System.out.println(l.toString());
         }
     }
@@ -112,7 +104,9 @@ public class ReadXml {
             patients.add(new Patient(e));
         }
         
+        PatientDao dao = new PatientDao(conexion);
         for(Patient p : patients) {
+            dao.insertPatient(p);
             System.out.println(p.toString());
         }
     }
@@ -124,7 +118,9 @@ public class ReadXml {
             exams.add(new Exam(e));
         }
         
+        ExamDao dao = new ExamDao(conexion);
         for(Exam e : exams){
+            dao.insertExam(e);
             System.out.println(e.toString());
         }
     }
@@ -136,7 +132,9 @@ public class ReadXml {
             reports.add(new Report(e));
         }
         
+        ReportDao dao = new ReportDao(conexion);
         for(Report r: reports) {
+            dao.insertReport(r);
             System.out.println(r.toString());
         }
     }
@@ -148,7 +146,9 @@ public class ReadXml {
             results.add(new Result(e));
         } 
         
+        ResultDao dao = new ResultDao(conexion);
         for(Result r : results) {
+            dao.insertResult(r);
             System.out.println(r.toString());
         }
     }
@@ -160,7 +160,9 @@ public class ReadXml {
             appoint.add(new Appointment(e));
         }
         
+        AppointmentDao dao = new AppointmentDao(conexion);
         for(Appointment a : appoint) {
+            dao.insertAppointment(a);
             System.out.println(a.toString());
         }
     }
@@ -199,7 +201,7 @@ public class ReadXml {
         java.sql.Date date = null;
         try {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            Date fecha = format.parse(source);
+            java.util.Date fecha = format.parse(source);
             date = new java.sql.Date(fecha.getTime());
         } catch (ParseException ex) {
             ex.printStackTrace(System.out);
