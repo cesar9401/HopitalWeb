@@ -1,28 +1,30 @@
 package com.hospital.controller;
 
 import com.hospital.conexion.Conexion;
+import com.hospital.dao.*;
+import com.hospital.model.*;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 /**
  *
  * @author cesar31
  */
-@WebServlet(name = "ControllerAdmin", urlPatterns = {"/ControllerAdmin"})
+@WebServlet(name = "MainController", urlPatterns = {"/MainController"})
 @MultipartConfig(maxFileSize = 16177215)
-public class ControllerAdmin extends HttpServlet {
+public class MainController extends HttpServlet {
+
+    private final Connection conexion = Conexion.getConnection();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -62,7 +64,15 @@ public class ControllerAdmin extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        String action = request.getParameter("action");
+        switch (action) {
+            case "singOff":
+                HttpSession session = request.getSession();
+                session.invalidate();
+                //request.getRequestDispatcher("index.jsp").forward(request, response);
+                response.sendRedirect("index.jsp");
+                break;
+        }
     }
 
     /**
@@ -82,6 +92,9 @@ public class ControllerAdmin extends HttpServlet {
             case "load":
                 loadData(request, response);
                 break;
+            case "login":;
+                initLogin(request, response);
+                break;
         }
     }
 
@@ -93,6 +106,53 @@ public class ControllerAdmin extends HttpServlet {
 
         } catch (IOException | ServletException ex) {
             ex.printStackTrace(System.out);
+        }
+    }
+
+    private void initLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String email = request.getParameter("email");
+        String pass = request.getParameter("pass");
+        String value = request.getParameter("tipoUsuario");
+
+        switch (value) {
+            case "PATIENTS":
+                PatientDao pd = new PatientDao(conexion);
+                Patient p = pd.getPatien(email, pass);
+                if (p != null) {
+                    System.out.println(p.toString());
+                }
+                break;
+            case "DOCTORS":
+                DoctorDao dd = new DoctorDao(conexion);
+                Doctor d = dd.getDoctor(email, pass);
+                if (d != null) {
+                    System.out.println(d.toString());
+                }
+                break;
+            case "LAB_WORKERS":
+                LabWorkerDao ld = new LabWorkerDao(conexion);
+                LabWorker l = ld.getLabWorker(email, pass);
+                if (l != null) {
+                    System.out.println(l.toString());
+                }
+                break;
+            case "ADMINISTRATORS":
+                AdministratorDao ad = new AdministratorDao(conexion);
+                SpecialtyDao sDao = new SpecialtyDao(conexion);
+                ExamDao eDao = new ExamDao(conexion);
+                Administrator a = ad.getAdminById(email, pass);
+                List<Specialty> specialties = sDao.getSpecialties();
+                List<Exam> exams = eDao.getExams();
+
+                if (a != null) {
+                    System.out.println(a.toString());
+                    request.getSession().setAttribute("user", a.getAdminId());
+                    request.getSession().setAttribute("profile", a);
+                    request.getSession().setAttribute("specialties", specialties);
+                    request.getSession().setAttribute("exams", exams);
+                    request.getRequestDispatcher("adminView.jsp").forward(request, response);
+                }
+                break;
         }
     }
 

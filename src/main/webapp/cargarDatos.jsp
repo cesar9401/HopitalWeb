@@ -21,7 +21,7 @@
             </div>
             <div class="row mt-4 mb-4">
                 <div class="col-12 col-md-4 offset-md-4">
-                    <form action="ControllerAdmin" method="post" enctype="multipart/form-data">
+                    <form action="MainController" method="post" enctype="multipart/form-data">
                         <div class="form-group">
                             <label for="exampleFormControlFile1">Example file input</label>
                             <input type="file" class="form-control-file text-center" id="exampleFormControlFile1" accept=".xml" name="file">

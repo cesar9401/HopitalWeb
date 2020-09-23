@@ -3,7 +3,12 @@ package com.hospital.dao;
 import com.hospital.model.Specialty;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -22,7 +27,8 @@ public class SpecialtyDao {
 
     /**
      * Metodo para insertar una especialidad en la base de datos
-     * @param s 
+     *
+     * @param s
      */
     public void insertSpecialty(Specialty s) {
         String query = "INSERT INTO SPECIALTIES(degree, price_consultation) VALUES(?, ?)";
@@ -34,19 +40,39 @@ public class SpecialtyDao {
             ex.printStackTrace(System.out);
         }
     }
-    
+
     /**
-     * Metodo para insertar las especialidades o grados academicos de cada medico
-     * @param s 
+     * Metodo para insertar las especialidades o grados academicos de cada
+     * medico
+     *
+     * @param s
      */
     public void insertMedicalDegree(Specialty s) {
         String query = "INSERT INTO MEDICAL_DEGREES(doctor_id, specialty_id) VALUES(?, (SELECT specialty_id FROM SPECIALTIES WHERE degree = ? LIMIT 1))";
-        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+        try ( PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setString(1, s.getDoctorId());
             pst.setString(2, s.getDegree());
             pst.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
+    }
+
+    /**
+     * Metodo para obtener listado de especialidades y precios
+     *
+     * @return
+     */
+    public List<Specialty> getSpecialties() {
+        List<Specialty> specialties = new ArrayList<>();
+        String query = "SELECT * FROM SPECIALTIES";
+        try ( PreparedStatement pst = this.transaction.prepareStatement(query);  ResultSet rs = pst.executeQuery()) {
+            while (rs.next()) {
+                specialties.add(new Specialty(rs));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        return specialties;
     }
 }

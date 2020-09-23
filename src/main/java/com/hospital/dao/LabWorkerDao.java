@@ -77,7 +77,7 @@ public class LabWorkerDao {
     public LabWorker getLabWorker(String email, String pass) {
         LabWorker lab = null;
         String query = "SELECT * FROM LAB_WORKERS WHERE email = ? and password = ?";
-        try ( PreparedStatement pst = this.transaction.prepareStatement(pass)) {
+        try ( PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setString(1, email);
             pst.setString(2, pass);
             try ( ResultSet rs = pst.executeQuery()) {

@@ -6,7 +6,6 @@ import com.hospital.dao.LabWorkerDao;
 import com.hospital.model.Exam;
 import com.hospital.model.LabWorker;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -16,24 +15,19 @@ import java.util.List;
 public class MainTest {
 
     public static void main(String[] args) {
-        try {
-            //Write your code here
-            Connection transaction = Conexion.getConnection();
-            LabWorkerDao dao = new LabWorkerDao(transaction);
-            List<LabWorker> d = dao.getLabWorkers();
-            System.out.println("Laboratoristas");
-            for (LabWorker d1 : d) {
-                System.out.println(d1.toString());
-            }
-            
-            System.out.println("Examenes");
-            ExamDao daoE = new ExamDao(transaction);
-            List<Exam> exams = daoE.getExams();
-            for(Exam e : exams) {
-                System.out.println(e.toString());
-            }
-        } catch (SQLException | ClassNotFoundException ex) {
-            ex.printStackTrace(System.out);
+        //Write your code here
+        Connection transaction = Conexion.getConnection();
+        LabWorkerDao dao = new LabWorkerDao(transaction);
+        List<LabWorker> d = dao.getLabWorkers();
+        System.out.println("Laboratoristas");
+        for (LabWorker d1 : d) {
+            System.out.println(d1.toString());
+        }
+        System.out.println("Examenes");
+        ExamDao daoE = new ExamDao(transaction);
+        List<Exam> exams = daoE.getExams();
+        for(Exam e : exams) {
+            System.out.println(e.toString());
         }
     }
 }

@@ -1,12 +1,15 @@
 package com.hospital.model;
 
+import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import org.jdom2.Element;
 
 /**
  *
  * @author cesar31
  */
-public class Specialty {
+public class Specialty implements Serializable{
 
     private int specialtyId;
     private String degree;
@@ -16,9 +19,18 @@ public class Specialty {
     private int degreeId;
     private String doctorId;
 
+    public Specialty() {
+    }
+    
     public Specialty(Element e) {
         this.degree = e.getChildText("TIPO");
         this.priceConsultation = Double.parseDouble(e.getChildText("COSTO"));
+    }
+    
+    public Specialty(ResultSet rs) throws SQLException {
+        this.specialtyId = rs.getInt("specialty_id");
+        this.degree = rs.getString("degree");
+        this.priceConsultation = rs.getDouble("price_consultation");
     }
 
     public Specialty(String degree) {
