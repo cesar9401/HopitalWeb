@@ -119,7 +119,9 @@ public class MainController extends HttpServlet {
                 PatientDao pd = new PatientDao(conexion);
                 Patient p = pd.getPatien(email, pass);
                 if (p != null) {
-                    System.out.println(p.toString());
+                    request.getSession().setAttribute("user", p.getPatientId());
+                    request.getSession().setAttribute("profile", p);
+                    request.getRequestDispatcher("patientView.jsp").forward(request, response);
                 }
                 break;
             case "DOCTORS":
@@ -145,7 +147,6 @@ public class MainController extends HttpServlet {
                 List<Exam> exams = eDao.getExams();
 
                 if (a != null) {
-                    System.out.println(a.toString());
                     request.getSession().setAttribute("user", a.getAdminId());
                     request.getSession().setAttribute("profile", a);
                     request.getSession().setAttribute("specialties", specialties);

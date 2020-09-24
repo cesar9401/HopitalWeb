@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Time;
 import org.jdom2.Element;
 
@@ -41,6 +43,19 @@ public class Result extends Report {
             //ex.printStackTrace(System.out);
             System.out.println("Pruebas sin archivos");
         }
+    }
+    
+    public Result(ResultSet rs) throws SQLException {
+        //super(rs);
+        super.setReportId(rs.getInt("result_id"));
+        super.setAppointmentId(rs.getInt("appointment_lab_id"));
+        super.setPatientId(rs.getInt("patient_id"));
+        this.examId = rs.getInt("exam_id");
+        this.labWorkerId = rs.getString("lab_worker_id");
+        this.orderResult = (InputStream) rs.getBlob("exam_order");
+        this.reportResult = (InputStream) rs.getBlob("report");
+        super.setDate(rs.getDate("date"));
+        super.setTime(rs.getTime("time"));
     }
 
     public Result(String labWorkerId, int reportId, int appointmentId, int patientId, Date date, Time time) {
