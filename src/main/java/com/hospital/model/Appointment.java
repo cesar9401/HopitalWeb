@@ -2,6 +2,8 @@ package com.hospital.model;
 
 import com.hospital.controller.ReadXml;
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Time;
 import org.jdom2.Element;
 
@@ -25,6 +27,20 @@ public class Appointment {
         this.doctorId = e.getChildText("MEDICO");
         this.date = ReadXml.getDate(e.getChildText("FECHA"));
         this.time = ReadXml.getTime(e.getChildText("HORA"));
+    }
+    
+    public Appointment(ResultSet rs, boolean lab) throws SQLException {
+        if(lab) {
+            this.appointmentId = rs.getInt("appointment_lab_id");
+            this.examId = rs.getInt("exam_id");
+        } else {
+            this.appointmentId = rs.getInt("appointment_id");
+        }
+        this.patientId = rs.getInt("patient_id");
+        this.doctorId = rs.getString("doctor_id");
+        this.date = rs.getDate("date");
+        this.time = rs.getTime("time");
+        this.status = rs.getBoolean("status");
     }
 
     public Appointment(int appointmentId, int patientId, String doctorId, Date date, Time time) {

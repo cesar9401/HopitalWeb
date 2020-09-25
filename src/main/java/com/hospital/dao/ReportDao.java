@@ -7,8 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -26,7 +24,7 @@ public class ReportDao {
     }
 
     /**
-     * Metodo para insertar un reporte en la base de datos
+     * Metodo para insertar un informe en la base de datos
      *
      * @param r
      */
@@ -46,6 +44,11 @@ public class ReportDao {
         }
     }
 
+    /**
+     * Metodo para obtener un listado de los informes a la base de 
+     * @param patientId
+     * @return 
+     */
     public List<Report> getReportsByPatient(int patientId) {
         List<Report> reports = new ArrayList<>();
         String query = "SELECT * FROM REPORTS WHERE patient_id = ? ORDER BY date";

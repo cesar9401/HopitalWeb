@@ -25,7 +25,6 @@ public class Person {
         this.phone = e.getChildText("TELEFONO");
         this.email = e.getChildText("CORREO");
         this.pass = e.getChildText("PASSWORD");
-
     }
 
     public Person(ResultSet rs) throws SQLException {

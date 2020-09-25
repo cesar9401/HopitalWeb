@@ -3,7 +3,12 @@ package com.hospital.dao;
 import com.hospital.model.Appointment;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -59,5 +64,28 @@ public class AppointmentDao {
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
+    }
+
+    public List<Appointment> getAppointmentsByPatient(int patientId, boolean status, boolean lab) {
+        List<Appointment> appointments = new ArrayList<>();
+        String query;
+        if (lab) {
+            query = "SELECT * FROM APPOINTMENTS_LAB WHERE patient_id = ? AND status = ? ORDER BY date";
+        } else {
+            query = "SELECT * FROM APPOINTMENTS WHERE patient_id = ? AND status = ? ORDER BY date";
+        }
+        try ( PreparedStatement pst = this.transaction.prepareStatement(query);) {
+            pst.setInt(1, patientId);
+            pst.setBoolean(2, status);
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    appointments.add(new Appointment(rs, lab));
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+
+        return appointments;
     }
 }

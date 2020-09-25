@@ -119,8 +119,21 @@ public class MainController extends HttpServlet {
                 PatientDao pd = new PatientDao(conexion);
                 Patient p = pd.getPatien(email, pass);
                 if (p != null) {
+                    ResultDao rDao = new ResultDao(conexion);
+                    List<Result> results = rDao.getResultsByPatient(p.getPatientId());
+                    ReportDao rD = new ReportDao(conexion);
+                    List<Report> reports = rD.getReportsByPatient(p.getPatientId());
+                    AppointmentDao aD = new AppointmentDao(conexion);
+                    List<Appointment> app = aD.getAppointmentsByPatient(p.getPatientId(), false, false);
+                    List<Appointment> appLab = aD.getAppointmentsByPatient(p.getPatientId(), false, true);
+                    
                     request.getSession().setAttribute("user", p.getPatientId());
                     request.getSession().setAttribute("profile", p);
+                    request.getSession().setAttribute("results", results);
+                    request.getSession().setAttribute("reports", reports);
+                    request.getSession().setAttribute("app", app);
+                    request.getSession().setAttribute("appLab", appLab);
+                    
                     request.getRequestDispatcher("patientView.jsp").forward(request, response);
                 }
                 break;
@@ -140,13 +153,14 @@ public class MainController extends HttpServlet {
                 break;
             case "ADMINISTRATORS":
                 AdministratorDao ad = new AdministratorDao(conexion);
-                SpecialtyDao sDao = new SpecialtyDao(conexion);
-                ExamDao eDao = new ExamDao(conexion);
                 Administrator a = ad.getAdminById(email, pass);
-                List<Specialty> specialties = sDao.getSpecialties();
-                List<Exam> exams = eDao.getExams();
 
                 if (a != null) {
+                    SpecialtyDao sDao = new SpecialtyDao(conexion);
+                    ExamDao eDao = new ExamDao(conexion);
+                    List<Specialty> specialties = sDao.getSpecialties();
+                    List<Exam> exams = eDao.getExams();
+
                     request.getSession().setAttribute("user", a.getAdminId());
                     request.getSession().setAttribute("profile", a);
                     request.getSession().setAttribute("specialties", specialties);

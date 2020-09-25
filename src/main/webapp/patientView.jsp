@@ -4,10 +4,18 @@
     Author     : cesar31
 --%>
 
+<%@page import="com.hospital.model.Appointment"%>
+<%@page import="com.hospital.model.Report"%>
+<%@page import="com.hospital.model.Result"%>
+<%@page import="java.util.List"%>
 <%@page import="com.hospital.model.Patient"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
     Patient p = (Patient) session.getAttribute("profile");
+    List<Result> results = (List<Result>) session.getAttribute("results");
+    List<Report> reports = (List<Report>) session.getAttribute("reports");
+    List<Appointment> app = (List<Appointment>) session.getAttribute("app");
+    List<Appointment> appLab = (List<Appointment>) session.getAttribute("appLab");
 %>
 
 <!DOCTYPE html>
@@ -65,14 +73,114 @@
             </div>
         </div>
 
-        <!--HISTORIAL MEDICO-->
-        <section id="historial" class="mt-2 mb-2 pt-2 pb-2">
+        <!--Mis citas-->
+        <section id="mis-citas" class="mt-2 mb-2 pt-2 pb-2">
             <div class="container">
                 <div class="row text-center">
+                    <div class="col">
+                        <h1>Mis citas</h1>
+                    </div>
+                </div>
+
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">First</th>
+                            <th scope="col">Last</th>
+                            <th scope="col">Handle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>Mark</td>
+                            <td>Otto</td>
+                            <td>@mdo</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </section>
+
+        <!--Historial Medico-->
+        <section id="historial" class="mt-2 mb-2 pt-2 pb-2">
+            <div class="container">
+                <div class="row text-center mb-4">
                     <div class="col">
                         <h2>Mi Historial Medico</h2>
                     </div>
                 </div>
+
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Consulta/Examen</th>
+                            <th scope="col">Hora</th>
+                            <th scope="col">Fecha</th>
+                            <th scope="col">Ver m&aacutes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%int i = 0, j = 0;
+                            while (reports.size() != i && results.size() != j) {
+                                if (reports.get(i).getDate().before(results.get(j).getDate())) {
+                        %>
+                        <tr>
+                            <th scope="row"><span class="badge badge-danger">Informe</span></th>
+                            <td>Informe: <%=reports.get(i).getDate()%></td>
+                            <td><%=reports.get(i).getTime()%></td>
+                            <td><%=reports.get(i).getDate()%></td>
+                            <td><a href="#" class="btn btn-outline-info">Ver más</a></td>
+                        </tr>
+                        <%
+                            i++;
+                            if (i == reports.size()) {
+                                while (results.size() != j) {
+                        %>
+                        <tr>
+                            <th scope="row"><span class="badge badge-info">Resultado</span></th>
+                            <td>Resultado: <%=results.get(j).getDate()%></td>
+                            <td><%=results.get(j).getTime()%></td>
+                            <td><%=results.get(j).getDate()%></td>
+                            <td><a href="#" class="btn btn-outline-info">Ver más</a></td>
+                        </tr>
+                        <%
+                                    j++;
+                                }
+                            }
+                        } else {
+                        %>
+                        <tr>
+                            <th scope="row"><span class="badge badge-info">Resultado</span></th>
+                            <td>Resultado: <%=results.get(j).getDate()%></td>
+                            <td>Otto</td>
+                            <td></td>
+                            <td><a href="#" class="btn btn-outline-info">Ver más</a></td>
+                        </tr>
+                        <%
+                            j++;
+                            if (j == results.size()) {
+                                while (reports.size() != i) {
+                        %>
+                        <tr>
+                            <th scope="row"><span class="badge badge-danger">Informe</span></th>
+                            <td><%=reports.get(i).getDate()%></td>
+                            <td>Otto</td>
+                            <td></td>
+                            <td><a href="#" class="btn btn-outline-info">Ver más</a></td>
+                        </tr>
+                        <%
+                                            i++;
+                                        }
+                                    }
+                                }
+                            }
+                        %>
+                    </tbody>
+                </table>
             </div>
         </section>
 

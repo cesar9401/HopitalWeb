@@ -1,9 +1,11 @@
 package com.hospital.model;
 
+import com.hospital.controller.ReadXml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,7 +16,13 @@ import org.jdom2.Element;
  *
  * @author cesar31
  */
-public class Result extends Report {
+public class Result implements Serializable{
+
+    private int resultId;
+    private int appointmentLabId;
+    private int patientId;
+    private Date date;
+    private Time time;
 
     private String labWorkerId;
     private int examId;
@@ -22,7 +30,9 @@ public class Result extends Report {
     private InputStream reportResult;
 
     public Result(Element e) {
-        super(e);
+        //super(e);
+        this.resultId = Integer.parseInt(e.getChildText("CODIGO"));
+        this.patientId = Integer.parseInt(e.getChildText("PACIENTE"));
         this.examId = Integer.parseInt(e.getChildText("EXAMEN"));
         this.labWorkerId = e.getChildText("LABORATORISTA");
         try {
@@ -43,29 +53,60 @@ public class Result extends Report {
             //ex.printStackTrace(System.out);
             System.out.println("Pruebas sin archivos");
         }
+        this.date = ReadXml.getDate(e.getChildText("FECHA"));
+        this.time = ReadXml.getTime(e.getChildText("HORA"));        
     }
-    
+
     public Result(ResultSet rs) throws SQLException {
-        //super(rs);
-        super.setReportId(rs.getInt("result_id"));
-        super.setAppointmentId(rs.getInt("appointment_lab_id"));
-        super.setPatientId(rs.getInt("patient_id"));
+        this.resultId = rs.getInt("result_id");
+        this.appointmentLabId = rs.getInt("appointment_lab_id");
+        this.patientId = rs.getInt("patient_id");
         this.examId = rs.getInt("exam_id");
         this.labWorkerId = rs.getString("lab_worker_id");
         this.orderResult = (InputStream) rs.getBlob("exam_order");
         this.reportResult = (InputStream) rs.getBlob("report");
-        super.setDate(rs.getDate("date"));
-        super.setTime(rs.getTime("time"));
+        this.date = rs.getDate("date");
+        this.time = rs.getTime("time");
     }
 
-    public Result(String labWorkerId, int reportId, int appointmentId, int patientId, Date date, Time time) {
-        super(reportId, appointmentId, patientId, date, time);
-        this.labWorkerId = labWorkerId;
+    public int getResultId() {
+        return resultId;
     }
 
-    public Result(int examId, int reportId, int appointmentId, int patientId, Date date, Time time) {
-        super(reportId, appointmentId, patientId, date, time);
-        this.examId = examId;
+    public void setResultId(int resultId) {
+        this.resultId = resultId;
+    }
+
+    public int getAppointmentLabId() {
+        return appointmentLabId;
+    }
+
+    public void setAppointmentLabId(int appointmentLabId) {
+        this.appointmentLabId = appointmentLabId;
+    }
+
+    public int getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(int patientId) {
+        this.patientId = patientId;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public Time getTime() {
+        return time;
+    }
+
+    public void setTime(Time time) {
+        this.time = time;
     }
 
     public String getLabWorkerId() {
@@ -102,6 +143,6 @@ public class Result extends Report {
 
     @Override
     public String toString() {
-        return super.toString() + "Result{" + "labWorkerId=" + labWorkerId + ", examId=" + examId + ", orderResult=" + orderResult + ", reportResult=" + reportResult + '}';
+        return "Result{" + "resultId=" + resultId + ", appointmentLabId=" + appointmentLabId + ", patientId=" + patientId + ", date=" + date + ", time=" + time + ", labWorkerId=" + labWorkerId + ", examId=" + examId + ", orderResult=" + orderResult + ", reportResult=" + reportResult + '}';
     }
 }
