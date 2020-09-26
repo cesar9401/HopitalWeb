@@ -10,12 +10,13 @@
 <%@page import="java.util.List"%>
 <%@page import="com.hospital.model.Patient"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
-    Patient p = (Patient) session.getAttribute("profile");
+    //Patient p = (Patient) session.getAttribute("profile");
     List<Result> results = (List<Result>) session.getAttribute("results");
     List<Report> reports = (List<Report>) session.getAttribute("reports");
-    List<Appointment> app = (List<Appointment>) session.getAttribute("app");
-    List<Appointment> appLab = (List<Appointment>) session.getAttribute("appLab");
+    //List<Appointment> app = (List<Appointment>) session.getAttribute("app");
+    //List<Appointment> appLab = (List<Appointment>) session.getAttribute("appLab");
 %>
 
 <!DOCTYPE html>
@@ -62,11 +63,11 @@
         <!--Info profile-->
         <div class="jumbotron pt-4 pb-4">
             <div class="container text-center">
-                <h1 class="display-4"><%=p.getName()%></h1>
-                <p class="lead"><span class="font-weight-bold">Fecha de Nacimiento: </span><%=p.getBirth()%></p>
-                <p class="lead"><span class="font-weight-bold">Peso: </span><%=p.getWeight()%> Kg</p>
-                <p class="lead"><span class="font-weight-bold">Tipo de Sangre: </span><%=p.getBlood()%></p>
-                <p class="lead"><span class="font-weight-bold">Telefono: </span><%=p.getPhone()%></p>
+                <h1 class="display-4">${profile.name}</h1>
+                <p class="lead"><span class="font-weight-bold">Fecha de Nacimiento: </span>${profile.birth}</p>
+                <p class="lead"><span class="font-weight-bold">Peso: </span>${profile.weight} Kg</p>
+                <p class="lead"><span class="font-weight-bold">Tipo de Sangre: </span>${profile.blood}</p>
+                <p class="lead"><span class="font-weight-bold">Telefono: </span>${profile.phone}</p>
                 <hr class="my-4">
                 <p>HOSPITAL PASTEUR - Ciudad de Quetzaltenango, Guatemala</p>
                 <a class="btn btn-outline-success" href="#" role="button">Actualizar Datos</a>
@@ -92,15 +93,31 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Mark</td>
-                            <td>Otto</td>
-                            <td>@mdo</td>
-                        </tr>
+                        <c:choose>
+                            <c:when test="${app.size() > 0 && appLab.size() > 0}">
+
+                            </c:when>
+                            <c:otherwise>
+                                <c:forEach var="a" items="${app}">
+                                    <tr>
+                                        <th scope="row">${a.date}</th>
+                                        <td>${a.time}</td>
+                                        <td>Otto</td>
+                                        <td>@mdo</td>
+                                    </tr>
+                                </c:forEach>
+                                <c:forEach var="appL" items="${appLab}">
+                                    <tr>
+                                        <th scope="row">${appL.date}</th>
+                                        <td>Mark</td>
+                                        <td>Otto</td>
+                                        <td>@mdo</td>
+                                    </tr>
+                                </c:forEach>
+                            </c:otherwise>
+                        </c:choose>
                     </tbody>
                 </table>
-
             </div>
         </section>
 
@@ -124,66 +141,89 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <%int i = 0, j = 0;
-                            while (reports.size() != i && results.size() != j) {
-                                if (reports.get(i).getDate().before(results.get(j).getDate())) {
-                        %>
-                        <tr>
-                            <th scope="row"><span class="badge badge-danger">Informe</span></th>
-                            <td>Informe: <%=reports.get(i).getDate()%></td>
-                            <td><%=reports.get(i).getTime()%></td>
-                            <td><%=reports.get(i).getDate()%></td>
-                            <td><a href="#" class="btn btn-outline-info">Ver más</a></td>
-                        </tr>
-                        <%
-                            i++;
-                            if (i == reports.size()) {
-                                while (results.size() != j) {
-                        %>
-                        <tr>
-                            <th scope="row"><span class="badge badge-info">Resultado</span></th>
-                            <td>Resultado: <%=results.get(j).getDate()%></td>
-                            <td><%=results.get(j).getTime()%></td>
-                            <td><%=results.get(j).getDate()%></td>
-                            <td><a href="#" class="btn btn-outline-info">Ver más</a></td>
-                        </tr>
-                        <%
-                                    j++;
-                                }
-                            }
-                        } else {
-                        %>
-                        <tr>
-                            <th scope="row"><span class="badge badge-info">Resultado</span></th>
-                            <td>Resultado: <%=results.get(j).getDate()%></td>
-                            <td>Otto</td>
-                            <td></td>
-                            <td><a href="#" class="btn btn-outline-info">Ver más</a></td>
-                        </tr>
-                        <%
-                            j++;
-                            if (j == results.size()) {
-                                while (reports.size() != i) {
-                        %>
-                        <tr>
-                            <th scope="row"><span class="badge badge-danger">Informe</span></th>
-                            <td><%=reports.get(i).getDate()%></td>
-                            <td>Otto</td>
-                            <td></td>
-                            <td><a href="#" class="btn btn-outline-info">Ver más</a></td>
-                        </tr>
-                        <%
-                                            i++;
+                        <c:choose>
+                            <c:when test="${results.size() > 0 && reports.size() > 0}">
+                                <%int i = 0, j = 0;
+                                    while (reports.size() != i && results.size() != j) {
+                                        if (reports.get(i).getDate().before(results.get(j).getDate())) {
+                                %>
+                                <tr>
+                                    <th scope="row"><span class="badge badge-danger">Informe</span></th>
+                                    <td>Informe: <%=reports.get(i).getDate()%></td>
+                                    <td><%=reports.get(i).getTime()%></td>
+                                    <td><%=reports.get(i).getDate()%></td>
+                                    <td><a href="#" class="btn btn-outline-info">Ver más</a></td>
+                                </tr>
+                                <%
+                                    i++;
+                                    if (i == reports.size()) {
+                                        while (results.size() != j) {
+                                %>
+                                <tr>
+                                    <th scope="row"><span class="badge badge-info">Resultado</span></th>
+                                    <td>Resultado: <%=results.get(j).getDate()%></td>
+                                    <td><%=results.get(j).getTime()%></td>
+                                    <td><%=results.get(j).getDate()%></td>
+                                    <td><a href="#" class="btn btn-outline-info">Ver más</a></td>
+                                </tr>
+                                <%
+                                            j++;
                                         }
                                     }
-                                }
-                            }
-                        %>
+                                } else {
+                                %>
+                                <tr>
+                                    <th scope="row"><span class="badge badge-info">Resultado</span></th>
+                                    <td>Resultado: <%=results.get(j).getDate()%></td>
+                                    <td>Otto</td>
+                                    <td></td>
+                                    <td><a href="#" class="btn btn-outline-info">Ver más</a></td>
+                                </tr>
+                                <%
+                                    j++;
+                                    if (j == results.size()) {
+                                        while (reports.size() != i) {
+                                %>
+                                <tr>
+                                    <th scope="row"><span class="badge badge-danger">Informe</span></th>
+                                    <td><%=reports.get(i).getDate()%></td>
+                                    <td>Otto</td>
+                                    <td></td>
+                                    <td><a href="#" class="btn btn-outline-info">Ver más</a></td>
+                                </tr>
+                                <%
+                                                    i++;
+                                                }
+                                            }
+                                        }
+                                    }
+                                %>
+                            </c:when>
+                            <c:otherwise>
+                                <c:forEach var="rep" items="${reports}">
+                                    <tr>
+                                        <th scope="row"><span class="badge badge-danger">Informe</span></th>
+                                        <td>Informe: ${rep.date}</td>
+                                        <td>Otto</td>
+                                        <td></td>
+                                        <td><a href="#" class="btn btn-outline-info">Ver más</a></td>
+                                    </tr>
+                                </c:forEach>
+                                <c:forEach var="res" items="${results}">
+                                    <tr>
+                                        <th scope="row"><span class="badge badge-info">Resultado</span></th>
+                                        <td>Resultado: ${res.date}</td>
+                                        <td>Otto</td>
+                                        <td></td>
+                                        <td><a href="#" class="btn btn-outline-info">Ver más</a></td>
+                                    </tr>
+                                </c:forEach>   
+                            </c:otherwise>
+                        </c:choose>
                     </tbody>
                 </table>
             </div>
         </section>
-
         <%@include file="js.html"%>
     </body>
 </html>

@@ -70,9 +70,9 @@ public class AppointmentDao {
         List<Appointment> appointments = new ArrayList<>();
         String query;
         if (lab) {
-            query = "SELECT * FROM APPOINTMENTS_LAB WHERE patient_id = ? AND status = ? ORDER BY date";
+            query = "SELECT * FROM APPOINTMENTS_LAB WHERE patient_id = ? AND status = ? ORDER BY date, time";
         } else {
-            query = "SELECT * FROM APPOINTMENTS WHERE patient_id = ? AND status = ? ORDER BY date";
+            query = "SELECT * FROM APPOINTMENTS WHERE patient_id = ? AND status = ? ORDER BY date, time";
         }
         try ( PreparedStatement pst = this.transaction.prepareStatement(query);) {
             pst.setInt(1, patientId);

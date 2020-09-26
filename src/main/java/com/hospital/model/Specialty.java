@@ -1,6 +1,5 @@
 package com.hospital.model;
 
-import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.jdom2.Element;
@@ -9,7 +8,7 @@ import org.jdom2.Element;
  *
  * @author cesar31
  */
-public class Specialty implements Serializable{
+public class Specialty{
 
     private int specialtyId;
     private String degree;

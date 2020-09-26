@@ -1,6 +1,7 @@
 package com.hospital.model;
 
 import com.hospital.controller.ReadXml;
+import java.io.Serializable;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,7 +12,7 @@ import org.jdom2.Element;
  *
  * @author cesar31
  */
-public class Appointment {
+public class Appointment implements Serializable{
 
     private int appointmentId;
     private int patientId;

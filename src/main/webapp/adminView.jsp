@@ -10,13 +10,13 @@
 <%@page import="java.util.List"%>
 <%@page import="com.hospital.model.Administrator"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
-    String user = (String) session.getAttribute("user");
-    Administrator a = (Administrator) session.getAttribute("profile");
-    List<Specialty> specialties = (List<Specialty>) session.getAttribute("specialties");
-    List<Exam> exams = (List<Exam>) session.getAttribute("exams");
+    //String user = (String) session.getAttribute("user");
+    //Administrator a = (Administrator) session.getAttribute("profile");
+    //List<Specialty> specialties = (List<Specialty>) session.getAttribute("specialties");
+    //List<Exam> exams = (List<Exam>) session.getAttribute("exams");
 %>
-
 <!DOCTYPE html>
 <html>
     <head>
@@ -63,8 +63,8 @@
         <div class="jumbotron">
             <div class="container text-center">
                 <h1 class="display-4">Administrador</h1>
-                <p class="lead"><%=a.getAdminId()%></p>
-                <p class="lead"><%=a.getName()%></p>
+                <p class="lead">${profile.adminId}</p>
+                <p class="lead">${profile.name}</p>
                 <hr class="my-4">
                 <p>HOSPITAL PASTEUR - Ciudad de Quetzaltenango, Guatemala</p>
                 <a class="btn btn-primary btn-lg" href="#" role="button">Editar</a>
@@ -81,23 +81,22 @@
                     </div>
                 </div>
                 <div class="row mt-2">
-                    <%for (Specialty e : specialties) {%>
-                    <%String str = "specialty_1";
-                        if (e.getPriceConsultation() % 2 == 0) {
-                            str = "specialty_2";
-                        }
-                    %>
-                    <div class="col-md-6 col-lg-4 mb-4">
-                        <div class="card">
-                            <img src="resources/<%=str%>.jpg" class="card-img-top" alt="...">
-                            <div class="card-body">
-                                <h4 class="card-title"><span class="font-weight-bold">Especialidad: </span><%=e.getDegree()%></h4>
-                                <p class="card-text"><span class="font-weight-bold">Precio: </span>Q.<%=e.getPriceConsultation()%></p>
-                                <a href="#" class="btn btn-primary">Editar</a>
+                    <c:forEach var="e" items="${specialties}">
+                        <c:set var="str" value="specialty_1"></c:set>
+                        <c:if test="${e.priceConsultation % 2 == 0}">
+                            <c:set var="str" value="specialty_2"></c:set>
+                        </c:if>
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card">
+                                <img src="resources/${str}.jpg" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h4 class="card-title"><span class="font-weight-bold">Especialidad: </span>${e.degree}</h4>
+                                    <p class="card-text"><span class="font-weight-bold">Precio: </span>Q.${e.priceConsultation}</p>
+                                    <a href="#" class="btn btn-primary">Editar</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <%}%>
+                    </c:forEach>
                 </div>
             </div>
         </section>
@@ -113,21 +112,20 @@
                 <div class="container">
 
                     <div class="row mt-2">
-                        <%for (Exam e : exams) {%>
-                        <div class="col-12 col-md-6">
-                            <div class="jumbotron jumbotron-fluid p-4">
-                                <h1><span class="font-weight-bold">Nombre: </span><%=e.getName()%></h1>
-                                <p class="lead font-weight-bold mt-1 mb-0">Descripcion</p>
-                                <p class="lead mt-0"><%=e.getDescription()%></p>
-                                <p class="lead"><span class="font-weight-bold">Precio: </span>Q.<%=e.getPrice()%></p>
+                        <c:forEach var="e" items="${exams}">
+                            <div class="col-12 col-md-6">
+                                <div class="jumbotron jumbotron-fluid p-4">
+                                    <h1><span class="font-weight-bold">Nombre: </span>${e.name}</h1>
+                                    <p class="lead font-weight-bold mt-1 mb-0">Descripcion</p>
+                                    <p class="lead mt-0">${e.description}</p>
+                                    <p class="lead"><span class="font-weight-bold">Precio: </span>Q.${e.price}</p>
+                                </div>
                             </div>
-                        </div>
-                        <%}%>
+                        </c:forEach>
                     </div>
                 </div>
             </div>
         </section>
-
         <%@include file="js.html"%>
     </body>
 </html>
