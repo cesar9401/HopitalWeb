@@ -25,6 +25,15 @@ import javax.servlet.http.Part;
 public class MainController extends HttpServlet {
 
     private final Connection conexion = Conexion.getConnection();
+    private final ResultDao resultDao = new ResultDao(conexion);
+    private final ReportDao reportDao = new ReportDao(conexion);
+    private final AppointmentDao appointmentDao = new AppointmentDao(conexion);
+    private final PatientDao patientDao = new PatientDao(conexion);
+    private final SpecialtyDao specialtyDao = new SpecialtyDao(conexion);
+    private final DoctorDao doctorDao = new DoctorDao(conexion);
+    private final ExamDao examDao = new ExamDao(conexion);
+    private final AdministratorDao administratorDao = new AdministratorDao(conexion);
+    private final LabWorkerDao labWorkerDao = new LabWorkerDao(conexion);
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -65,12 +74,18 @@ public class MainController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
+        System.out.println("action = " + action);
         switch (action) {
             case "singOff":
                 HttpSession session = request.getSession();
                 session.invalidate();
                 //request.getRequestDispatcher("index.jsp").forward(request, response);
                 response.sendRedirect("index.jsp");
+                break;
+            case "newAppointment":
+                List<Doctor> doctors = doctorDao.getDoctors();
+                request.getSession().setAttribute("doctors", doctors);
+                request.getRequestDispatcher("appointment.jsp").forward(request, response);
                 break;
         }
     }
@@ -92,8 +107,14 @@ public class MainController extends HttpServlet {
             case "load":
                 loadData(request, response);
                 break;
-            case "login":;
+            case "login":
                 initLogin(request, response);
+                break;
+            case "d_specialties":
+                int specialtyId = Integer.parseInt(request.getParameter("specialties"));
+                List<Doctor> doctors = doctorDao.getDoctorsBySpeciality(specialtyId);
+                request.getSession().setAttribute("doctors", doctors);
+                request.getRequestDispatcher("appointment.jsp").forward(request, response);
                 break;
         }
     }
@@ -116,50 +137,43 @@ public class MainController extends HttpServlet {
 
         switch (value) {
             case "PATIENTS":
-                PatientDao pd = new PatientDao(conexion);
-                Patient p = pd.getPatien(email, pass);
+                Patient p = patientDao.getPatien(email, pass);
                 if (p != null) {
-                    ResultDao rDao = new ResultDao(conexion);
-                    List<Result> results = rDao.getResultsByPatient(p.getPatientId());
-                    ReportDao rD = new ReportDao(conexion);
-                    List<Report> reports = rD.getReportsByPatient(p.getPatientId());
-                    AppointmentDao aD = new AppointmentDao(conexion);
-                    List<Appointment> app = aD.getAppointmentsByPatient(p.getPatientId(), false, false);
-                    List<Appointment> appLab = aD.getAppointmentsByPatient(p.getPatientId(), false, true);
-                    
+                    List<Result> results = resultDao.getResultsByPatient(p.getPatientId());
+                    List<Report> reports = reportDao.getReportsByPatient(p.getPatientId());
+                    List<Appointment> app = appointmentDao.getAppointmentsByPatient(p.getPatientId(), false, false);
+                    List<Appointment> appLab = appointmentDao.getAppointmentsByPatient(p.getPatientId(), false, true);
+                    List<Specialty> specialties = specialtyDao.getSpecialties();
+
                     request.getSession().setAttribute("user", p.getPatientId());
                     request.getSession().setAttribute("profile", p);
                     request.getSession().setAttribute("results", results);
                     request.getSession().setAttribute("reports", reports);
                     request.getSession().setAttribute("app", app);
                     request.getSession().setAttribute("appLab", appLab);
-                    
+                    request.getSession().setAttribute("specialties", specialties);
+
                     request.getRequestDispatcher("patientView.jsp").forward(request, response);
                 }
                 break;
             case "DOCTORS":
-                DoctorDao dd = new DoctorDao(conexion);
-                Doctor d = dd.getDoctor(email, pass);
+                Doctor d = doctorDao.getDoctor(email, pass);
                 if (d != null) {
                     System.out.println(d.toString());
                 }
                 break;
             case "LAB_WORKERS":
-                LabWorkerDao ld = new LabWorkerDao(conexion);
-                LabWorker l = ld.getLabWorker(email, pass);
+                LabWorker l = labWorkerDao.getLabWorker(email, pass);
                 if (l != null) {
                     System.out.println(l.toString());
                 }
                 break;
             case "ADMINISTRATORS":
-                AdministratorDao ad = new AdministratorDao(conexion);
-                Administrator a = ad.getAdminById(email, pass);
+                Administrator a = administratorDao.getAdminById(email, pass);
 
                 if (a != null) {
-                    SpecialtyDao sDao = new SpecialtyDao(conexion);
-                    ExamDao eDao = new ExamDao(conexion);
-                    List<Specialty> specialties = sDao.getSpecialties();
-                    List<Exam> exams = eDao.getExams();
+                    List<Specialty> specialties = specialtyDao.getSpecialties();
+                    List<Exam> exams = examDao.getExams();
 
                     request.getSession().setAttribute("user", a.getAdminId());
                     request.getSession().setAttribute("profile", a);

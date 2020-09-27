@@ -75,14 +75,30 @@ public class DoctorDao {
     public List<Doctor> getDoctors() {
         List<Doctor> doctors = new ArrayList<>();
         String query = "SELECT * FROM DOCTORS";
-        try ( PreparedStatement pst = this.transaction.prepareStatement(query); ResultSet rs = pst.executeQuery()) {
-            while(rs.next()) {
+        try ( PreparedStatement pst = this.transaction.prepareStatement(query);  ResultSet rs = pst.executeQuery()) {
+            while (rs.next()) {
                 doctors.add(new Doctor(rs));
             }
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
 
+        return doctors;
+    }
+
+    public List<Doctor> getDoctorsBySpeciality(int specialityId) {
+        List<Doctor> doctors = new ArrayList<>();
+        String query = "SELECT d.* FROM DOCTORS d INNER JOIN MEDICAL_DEGREES m ON d.doctor_id = m.doctor_id WHERE m.specialty_id = ?";
+        try ( PreparedStatement pst = this.transaction.prepareStatement(query);) {
+            pst.setInt(1, specialityId);
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    doctors.add(new Doctor(rs));
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
         return doctors;
     }
 }

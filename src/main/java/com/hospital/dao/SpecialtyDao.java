@@ -7,8 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -65,7 +63,7 @@ public class SpecialtyDao {
      */
     public List<Specialty> getSpecialties() {
         List<Specialty> specialties = new ArrayList<>();
-        String query = "SELECT * FROM SPECIALTIES";
+        String query = "SELECT * FROM SPECIALTIES ORDER BY degree";
         try ( PreparedStatement pst = this.transaction.prepareStatement(query);  ResultSet rs = pst.executeQuery()) {
             while (rs.next()) {
                 specialties.add(new Specialty(rs));
