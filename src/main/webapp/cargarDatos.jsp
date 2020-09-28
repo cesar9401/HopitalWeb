@@ -13,7 +13,7 @@
         <title>Hospital Web</title>
     </head>
     <body>
-        <div class ="container">
+        <div class="container">
             <div class="row mt-4 mb-2">
                 <div class="col-12">
                     <h1 class="text-center">Carga de Datos</h1>
@@ -34,3 +34,4 @@
         <%@include file="js.html"%>
     </body>
 </html>
+                                                                                

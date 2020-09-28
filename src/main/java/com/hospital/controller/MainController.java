@@ -6,7 +6,11 @@ import com.hospital.model.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.Time;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -47,7 +51,7 @@ public class MainController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
+        try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -79,13 +83,27 @@ public class MainController extends HttpServlet {
             case "singOff":
                 HttpSession session = request.getSession();
                 session.invalidate();
-                //request.getRequestDispatcher("index.jsp").forward(request, response);
-                response.sendRedirect("index.jsp");
+                request.getRequestDispatcher("index.jsp").forward(request, response);
+                //response.sendRedirect("index.jsp");
                 break;
             case "newAppointment":
                 List<Doctor> doctors = doctorDao.getDoctors();
                 request.getSession().setAttribute("doctors", doctors);
                 request.getRequestDispatcher("appointment.jsp").forward(request, response);
+                break;
+            default:
+                String doctorId = action;
+                java.sql.Date date = (java.sql.Date) request.getSession().getAttribute("date");
+                if(date == null){
+                    java.util.Date now = new java.util.Date();
+                    date.setTime(now.getTime());
+                    request.getSession().setAttribute("date", date);
+                }
+                Doctor d = doctorDao.getDoctor(doctorId);
+                List<Appointment> app = getAppointmentsByDoctor(d, date, false, false);
+                request.getSession().setAttribute("doctor", d);
+                request.getSession().setAttribute("appointments", app);
+                request.getRequestDispatcher("newAppointment.jsp").forward(request, response);
                 break;
         }
     }
@@ -111,9 +129,11 @@ public class MainController extends HttpServlet {
                 initLogin(request, response);
                 break;
             case "d_specialties":
-                int specialtyId = Integer.parseInt(request.getParameter("specialties"));
+                Integer specialtyId = Integer.parseInt(request.getParameter("specialties"));
+                java.sql.Date date = ReadXml.getDate(request.getParameter("date"));
                 List<Doctor> doctors = doctorDao.getDoctorsBySpeciality(specialtyId);
                 request.getSession().setAttribute("doctors", doctors);
+                request.getSession().setAttribute("date", date);
                 request.getRequestDispatcher("appointment.jsp").forward(request, response);
                 break;
         }
@@ -183,6 +203,41 @@ public class MainController extends HttpServlet {
                 }
                 break;
         }
+    }
+
+    /**
+     * Metodo para obtener el listado de citas de un doctor por día
+     *
+     * @param doc
+     * @param date
+     * @param status
+     * @param lab
+     * @return
+     */
+    private List<Appointment> getAppointmentsByDoctor(Doctor doc, java.sql.Date date, boolean status, boolean lab) {
+        List<Appointment> app = appointmentDao.getAppointmentsByDoctor(doc.getDoctorId(), date, status, lab);
+        List<Appointment> newApp = new ArrayList<>();
+        long dif = doc.getEndTime().getTime() - doc.getStartTime().getTime();
+        int hours = (int) TimeUnit.MILLISECONDS.toHours(dif);
+        long milli = dif / hours;
+        java.sql.Time time = new java.sql.Time(doc.getStartTime().getTime());
+
+        for (int i = 0; i < hours; i++) {
+            boolean isApp = false;
+            for (Appointment a : app) {
+                if (time.equals(a.getTime())) {
+                    newApp.add(a);
+                    isApp = true;
+                    break;
+                }
+            }
+            if (!isApp) {
+                java.sql.Time tmp = new Time(time.getTime());
+                newApp.add(new Appointment(tmp, true));
+            }
+            time.setTime(time.getTime() + milli);
+        }
+        return newApp;
     }
 
     /**

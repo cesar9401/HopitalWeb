@@ -1,5 +1,6 @@
 package com.hospital.model;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.jdom2.Element;
@@ -8,7 +9,7 @@ import org.jdom2.Element;
  *
  * @author cesar31
  */
-public class Person {
+public class Person implements Serializable{
 
     private String name;
     private String dpi;

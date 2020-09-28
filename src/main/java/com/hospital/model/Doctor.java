@@ -1,6 +1,7 @@
 package com.hospital.model;
 
 import com.hospital.controller.ReadXml;
+import java.io.Serializable;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,7 +14,7 @@ import org.jdom2.Element;
  *
  * @author cesar31
  */
-public class Doctor extends Person {
+public class Doctor extends Person implements Serializable{
 
     private String doctorId;
     private String collegiate;
@@ -44,6 +45,15 @@ public class Doctor extends Person {
         this.startTime = rs.getTime("start_time");
         this.endTime = rs.getTime("end_time");
         this.startDate = rs.getDate("start_date");
+        String s = rs.getString("specialties");
+        setSpecialty(s);        
+    }
+    
+    private void setSpecialty(String s) {
+        String [] sp = s.split(",");
+        for (String sp1 : sp) {
+            specialties.add(new Specialty(sp1));
+        }
     }
 
     public Doctor(String doctorId, String name, String email, String pass) {

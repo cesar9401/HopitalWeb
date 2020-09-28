@@ -32,7 +32,7 @@ public class AppointmentDao {
      */
     public void insertAppointment(Appointment a) {
         String query = "INSERT INTO APPOINTMENTS(appointment_id, patient_id, doctor_id, date, time, status) VALUES(?, ?, ?, ?, ?, ?)";
-        try ( PreparedStatement pst = this.transaction.prepareStatement(query)) {
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setInt(1, a.getAppointmentId());
             pst.setInt(2, a.getPatientId());
             pst.setString(3, a.getDoctorId());
@@ -52,7 +52,7 @@ public class AppointmentDao {
      */
     public void inserAppointmentLab(Appointment a) {
         String query = "INSERT INTO APPOINTMENTS_LAB(appointment_lab_id, patient_id, doctor_id, exam_id, date, time, status) VALUES(?, ?, ?, ?, ?, ?, ?)";
-        try ( PreparedStatement pst = this.transaction.prepareStatement(query)) {
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setInt(1, a.getAppointmentId());
             pst.setInt(2, a.getPatientId());
             pst.setString(3, a.getDoctorId());
@@ -74,7 +74,7 @@ public class AppointmentDao {
         } else {
             query = "SELECT * FROM APPOINTMENTS WHERE patient_id = ? AND status = ? ORDER BY date, time";
         }
-        try ( PreparedStatement pst = this.transaction.prepareStatement(query);) {
+        try (PreparedStatement pst = this.transaction.prepareStatement(query);) {
             pst.setInt(1, patientId);
             pst.setBoolean(2, status);
             try (ResultSet rs = pst.executeQuery()) {
@@ -86,6 +86,23 @@ public class AppointmentDao {
             ex.printStackTrace(System.out);
         }
 
+        return appointments;
+    }
+
+    public List<Appointment> getAppointmentsByDoctor(String doctorId, java.sql.Date date, boolean status, boolean lab) {
+        List<Appointment> appointments = new ArrayList<>();
+        String query = "SELECT * FROM APPOINTMENTS WHERE doctor_id = ? AND date = ? AND status = ? ORDER BY time";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setString(1, doctorId);
+            pst.setDate(2, date);
+            pst.setBoolean(3, status);
+            ResultSet rs = pst.executeQuery();
+            while(rs.next()) {
+                appointments.add(new Appointment(rs, lab));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
         return appointments;
     }
 }

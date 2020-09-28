@@ -21,7 +21,13 @@ public class Appointment implements Serializable{
     private Date date;
     private Time time;
     private boolean status;
+    private boolean isAvailable;
 
+    public Appointment(java.sql.Time time, boolean isAvailable) {
+        this.time = time;
+        this.isAvailable = isAvailable;
+    }
+    
     public Appointment(Element e) {
         this.appointmentId = Integer.parseInt(e.getChildText("CODIGO"));
         this.patientId = Integer.parseInt(e.getChildText("PACIENTE"));
@@ -42,6 +48,7 @@ public class Appointment implements Serializable{
         this.date = rs.getDate("date");
         this.time = rs.getTime("time");
         this.status = rs.getBoolean("status");
+        this.isAvailable = false;
     }
 
     public Appointment(int appointmentId, int patientId, String doctorId, Date date, Time time) {
@@ -106,6 +113,14 @@ public class Appointment implements Serializable{
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public boolean isIsAvailable() {
+        return isAvailable;
+    }
+
+    public void setIsAvailable(boolean isAvailable) {
+        this.isAvailable = isAvailable;
     }
 
     @Override
