@@ -4,20 +4,8 @@
     Author     : cesar31
 --%>
 
-<%@page import="com.hospital.model.Appointment"%>
-<%@page import="com.hospital.model.Report"%>
-<%@page import="com.hospital.model.Result"%>
-<%@page import="java.util.List"%>
-<%@page import="com.hospital.model.Patient"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%
-    //Patient p = (Patient) session.getAttribute("profile");
-    //List<Result> results = (List<Result>) session.getAttribute("results");
-    //List<Report> reports = (List<Report>) session.getAttribute("reports");
-    //List<Appointment> app = (List<Appointment>) session.getAttribute("app");
-    //List<Appointment> appLab = (List<Appointment>) session.getAttribute("appLab");
-%>
 <!DOCTYPE html>
 <html>
     <head>

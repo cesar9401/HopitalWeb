@@ -7,8 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -46,6 +44,24 @@ public class AppointmentDao {
     }
 
     /**
+     * Metodo para insertar una nueva cita en el sistema
+     *
+     * @param a
+     */
+    public void insertNewAppointment(Appointment a) {
+        String query = "INSERT INTO APPOINTMENTS(patient_id, doctor_id, date, time) VALUES(?, ?, ?, ?)";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setInt(1, a.getPatientId());
+            pst.setString(2, a.getDoctorId());
+            pst.setDate(3, a.getDate());
+            pst.setTime(4, a.getTime());
+            pst.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+    }
+
+    /**
      * Metodo para insertar una cita en laboratorio, recibe objeto de tipo cita
      *
      * @param a
@@ -66,6 +82,14 @@ public class AppointmentDao {
         }
     }
 
+    /**
+     * Metodo para obtener las citas medicas y de lab de algun paciente
+     *
+     * @param patientId
+     * @param status
+     * @param lab
+     * @return
+     */
     public List<Appointment> getAppointmentsByPatient(int patientId, boolean status, boolean lab) {
         List<Appointment> appointments = new ArrayList<>();
         String query;
@@ -89,16 +113,43 @@ public class AppointmentDao {
         return appointments;
     }
 
-    public List<Appointment> getAppointmentsByDoctor(String doctorId, java.sql.Date date, boolean status, boolean lab) {
+    /**
+     * Metodo para obtener las citas de un medico segun determinada fecha
+     *
+     * @param doctorId
+     * @param date
+     * @param lab
+     * @return
+     */
+    public List<Appointment> getAppointmentsByDoctor(String doctorId, java.sql.Date date, boolean lab) {
         List<Appointment> appointments = new ArrayList<>();
-        String query = "SELECT * FROM APPOINTMENTS WHERE doctor_id = ? AND date = ? AND status = ? ORDER BY time";
+        String query = "SELECT * FROM APPOINTMENTS WHERE doctor_id = ? AND date = ? ORDER BY time";
         try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setString(1, doctorId);
             pst.setDate(2, date);
-            pst.setBoolean(3, status);
             ResultSet rs = pst.executeQuery();
-            while(rs.next()) {
+            while (rs.next()) {
                 appointments.add(new Appointment(rs, lab));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        return appointments;
+    }
+
+    /**
+     * Metodo para obtener las citas de algún doctor
+     * @param doctorId
+     * @return 
+     */
+    public List<Appointment> getAllAppointmentsDoc(String doctorId) {
+        List<Appointment> appointments = new ArrayList<>();
+        String query = "SELECT * FROM APPOINTMENTS WHERE doctor_id = ? ORDER BY date, time";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setString(1, doctorId);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                appointments.add(new Appointment(rs, false));
             }
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);

@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
+import javax.servlet.jsp.PageContext;
 
 /**
  *
@@ -94,15 +95,17 @@ public class MainController extends HttpServlet {
             default:
                 String doctorId = action;
                 java.sql.Date date = (java.sql.Date) request.getSession().getAttribute("date");
-                if(date == null){
+                if (date == null) {
                     java.util.Date now = new java.util.Date();
-                    date.setTime(now.getTime());
+                    date = new java.sql.Date(now.getTime());
                     request.getSession().setAttribute("date", date);
                 }
-                Doctor d = doctorDao.getDoctor(doctorId);
-                List<Appointment> app = getAppointmentsByDoctor(d, date, false, false);
-                request.getSession().setAttribute("doctor", d);
+                Doctor doctor = doctorDao.getDoctor(doctorId);
+                doctor.setSpecialties(specialtyDao.getSpecialtiesByDoctor(doctorId));
+                List<Appointment> app = getAppointmentsByDoctor(doctor, date, false);
+                request.getSession().setAttribute("doctor", doctor);
                 request.getSession().setAttribute("appointments", app);
+                request.getSession().setAttribute("success", null);
                 request.getRequestDispatcher("newAppointment.jsp").forward(request, response);
                 break;
         }
@@ -136,6 +139,12 @@ public class MainController extends HttpServlet {
                 request.getSession().setAttribute("date", date);
                 request.getRequestDispatcher("appointment.jsp").forward(request, response);
                 break;
+            case "changeDate":
+                changeDateApp(request, response);
+                break;
+            case "newAppointment":
+                setNewAppointment(request, response);
+                break;
         }
     }
 
@@ -150,6 +159,40 @@ public class MainController extends HttpServlet {
         }
     }
 
+    private void changeDateApp(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        java.sql.Date date = ReadXml.getDate(request.getParameter("date"));
+        String doctorId = request.getParameter("doctorId");
+        Doctor doctor = doctorDao.getDoctor(doctorId);
+        doctor.setSpecialties(specialtyDao.getSpecialtiesByDoctor(doctorId));
+        List<Appointment> app = getAppointmentsByDoctor(doctor, date, false);
+
+        request.getSession().setAttribute("date", date);
+        request.getSession().setAttribute("doctor", doctor);
+        request.getSession().setAttribute("appointments", app);
+        request.getRequestDispatcher("newAppointment.jsp").forward(request, response);
+    }
+
+    private void setNewAppointment(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String doctorId = request.getParameter("doctorId");
+        int patientId = Integer.parseInt(request.getParameter("patientId"));
+        int specialty = Integer.parseInt(request.getParameter("specialty"));
+        java.sql.Time time = ReadXml.getTime(request.getParameter("AppTime"));
+        java.sql.Date date = (java.sql.Date) request.getSession().getAttribute("date");
+        Appointment tmp = new Appointment(patientId, doctorId, specialty, date, time);
+        appointmentDao.insertNewAppointment(tmp);
+
+        Doctor doctor = doctorDao.getDoctor(doctorId);
+        doctor.setSpecialties(specialtyDao.getSpecialtiesByDoctor(doctorId));
+        List<Appointment> app = getAppointmentsByDoctor(doctor, date, false);
+
+        request.getSession().setAttribute("date", date);
+        request.getSession().setAttribute("doctor", doctor);
+        request.getSession().setAttribute("appointments", app);
+        request.getSession().setAttribute("appTmp", tmp);
+        request.getSession().setAttribute("success", true);
+        request.getRequestDispatcher("newAppointment.jsp").forward(request, response);
+    }
+
     private void initLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
         String pass = request.getParameter("pass");
@@ -159,33 +202,28 @@ public class MainController extends HttpServlet {
             case "PATIENTS":
                 Patient p = patientDao.getPatien(email, pass);
                 if (p != null) {
-                    List<Result> results = resultDao.getResultsByPatient(p.getPatientId());
-                    List<Report> reports = reportDao.getReportsByPatient(p.getPatientId());
-                    List<Appointment> app = appointmentDao.getAppointmentsByPatient(p.getPatientId(), false, false);
-                    List<Appointment> appLab = appointmentDao.getAppointmentsByPatient(p.getPatientId(), false, true);
-                    List<Specialty> specialties = specialtyDao.getSpecialties();
-
-                    request.getSession().setAttribute("user", p.getPatientId());
-                    request.getSession().setAttribute("profile", p);
-                    request.getSession().setAttribute("results", results);
-                    request.getSession().setAttribute("reports", reports);
-                    request.getSession().setAttribute("app", app);
-                    request.getSession().setAttribute("appLab", appLab);
-                    request.getSession().setAttribute("specialties", specialties);
-
-                    request.getRequestDispatcher("patientView.jsp").forward(request, response);
+                    setProfilePatient(request, response, p);
+                } else {
+                    setErrorLogin(request, response);
                 }
                 break;
             case "DOCTORS":
-                Doctor d = doctorDao.getDoctor(email, pass);
-                if (d != null) {
-                    System.out.println(d.toString());
+                Doctor doctor = doctorDao.getDoctor(email, pass);
+                if (doctor != null) {
+                    doctor.setSpecialties(specialtyDao.getSpecialtiesByDoctor(doctor.getDoctorId()));
+                    request.getSession().setAttribute("profile", doctor);
+                    request.getRequestDispatcher("doctorView.jsp").forward(request, response);
+                } else {
+                    setErrorLogin(request, response);
                 }
                 break;
             case "LAB_WORKERS":
                 LabWorker l = labWorkerDao.getLabWorker(email, pass);
                 if (l != null) {
                     System.out.println(l.toString());
+                } else {
+                    setErrorLogin(request, response);
+
                 }
                 break;
             case "ADMINISTRATORS":
@@ -200,9 +238,51 @@ public class MainController extends HttpServlet {
                     request.getSession().setAttribute("specialties", specialties);
                     request.getSession().setAttribute("exams", exams);
                     request.getRequestDispatcher("adminView.jsp").forward(request, response);
+                } else {
+                    setErrorLogin(request, response);
                 }
                 break;
         }
+    }
+
+    /**
+     * Metodo para dirigir al perfil del paciente
+     *
+     * @param request
+     * @param response
+     * @param p
+     * @throws ServletException
+     * @throws IOException
+     */
+    private void setProfilePatient(HttpServletRequest request, HttpServletResponse response, Patient p) throws ServletException, IOException {
+        List<Result> results = resultDao.getResultsByPatient(p.getPatientId());
+        List<Report> reports = reportDao.getReportsByPatient(p.getPatientId());
+        List<Appointment> app = appointmentDao.getAppointmentsByPatient(p.getPatientId(), false, false);
+        List<Appointment> appLab = appointmentDao.getAppointmentsByPatient(p.getPatientId(), false, true);
+        List<Specialty> specialties = specialtyDao.getSpecialties();
+
+        request.getSession().setAttribute("user", p.getPatientId());
+        request.getSession().setAttribute("profile", p);
+        request.getSession().setAttribute("results", results);
+        request.getSession().setAttribute("reports", reports);
+        request.getSession().setAttribute("app", app);
+        request.getSession().setAttribute("appLab", appLab);
+        request.getSession().setAttribute("specialties", specialties);
+        request.getRequestDispatcher("patientView.jsp").forward(request, response);
+    }
+
+    /**
+     * Envia mensaje de error si no se encuentra algun usuario con email y
+     * passwords proporcionados
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
+    private void setErrorLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getSession().setAttribute("error", true);
+        request.getRequestDispatcher("index.jsp").forward(request, response);
     }
 
     /**
@@ -214,8 +294,8 @@ public class MainController extends HttpServlet {
      * @param lab
      * @return
      */
-    private List<Appointment> getAppointmentsByDoctor(Doctor doc, java.sql.Date date, boolean status, boolean lab) {
-        List<Appointment> app = appointmentDao.getAppointmentsByDoctor(doc.getDoctorId(), date, status, lab);
+    private List<Appointment> getAppointmentsByDoctor(Doctor doc, java.sql.Date date, boolean lab) {
+        List<Appointment> app = appointmentDao.getAppointmentsByDoctor(doc.getDoctorId(), date, lab);
         List<Appointment> newApp = new ArrayList<>();
         long dif = doc.getEndTime().getTime() - doc.getStartTime().getTime();
         int hours = (int) TimeUnit.MILLISECONDS.toHours(dif);
@@ -249,5 +329,4 @@ public class MainController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }

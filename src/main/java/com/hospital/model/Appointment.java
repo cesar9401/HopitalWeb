@@ -18,6 +18,7 @@ public class Appointment implements Serializable{
     private int patientId;
     private String doctorId;
     private int examId;
+    private int specialty;
     private Date date;
     private Time time;
     private boolean status;
@@ -51,10 +52,10 @@ public class Appointment implements Serializable{
         this.isAvailable = false;
     }
 
-    public Appointment(int appointmentId, int patientId, String doctorId, Date date, Time time) {
-        this.appointmentId = appointmentId;
+    public Appointment(int patientId, String doctorId, int specialty, Date date, Time time) {
         this.patientId = patientId;
         this.doctorId = doctorId;
+        this.specialty = specialty;
         this.date = date;
         this.time = time;
     }
@@ -123,8 +124,16 @@ public class Appointment implements Serializable{
         this.isAvailable = isAvailable;
     }
 
+    public int getSpecialty() {
+        return specialty;
+    }
+
+    public void setSpecialty(int specialty) {
+        this.specialty = specialty;
+    }
+
     @Override
     public String toString() {
-        return "Appointment{" + "appointmentId=" + appointmentId + ", patientId=" + patientId + ", doctorId=" + doctorId + ", examId=" + examId + ", date=" + date + ", time=" + time + ", status=" + status + '}';
+        return "Appointment{" + "appointmentId=" + appointmentId + ", patientId=" + patientId + ", doctorId=" + doctorId + ", specialty=" + specialty + ", date=" + date + ", time=" + time + '}';
     }
 }
