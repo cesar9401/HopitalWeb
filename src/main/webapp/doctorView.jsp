@@ -16,42 +16,12 @@
     <body>
 
         <!--Nab Bar-->
-        <nav class="navbar navbar-expand-lg navbar-light sticky-top">
-            <div class="container">
-                <a class="navbar-brand" href="#">Dr. ${profile.name}</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Link1<span class="sr-only">(current)</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#exams">Link2</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Pricing</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Cuenta
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <a class="dropdown-item" href="#">Action</a>
-                                <a class="dropdown-item" href="#">Another action</a>
-                                <a class="dropdown-item" href="MainController?action=singOff">Cerrar Sesion</a>
-                            </div>
-                        </li>
-                    </ul>
-                </div>           
-            </div>
-        </nav>   
+        <jsp:include page="WEB-INF/navDoctor.jsp"></jsp:include>
 
-        <!--Datos doctor-->
-        <div class="jumbotron jumbotron-fluid text-center">
-            <div class="container">
-                <h3 class="display-4 my-0">Dr. ${profile.name}</h3>
+            <!--Datos doctor-->
+            <div class="jumbotron jumbotron-fluid text-center">
+                <div class="container">
+                    <h3 class="display-4 my-0">Dr. ${profile.name}</h3>
                 <p class="lead my-0">Horario: ${profile.startTime} - ${profile.endTime}</p>
                 <p class="lead my-0">Email: ${profile.email}</p>
                 <c:forEach var="s" items="${profile.specialties}">
@@ -64,16 +34,91 @@
 
         <!--Citas del dia-->
         <section id="citasHoy">
-            <div class="contanier">
+            <div class="container">
                 <div class="row">
                     <div class="col text-center">
-                        <h1 class="display-4    text-info">Citas del D&iacute;a</h1>
+                        <h1 class="display-3 text-info my-2">Citas del D&iacute;a</h1>
+                    </div>
+                </div>
+
+                <div class="row my-2 align-items-center">
+                    <!--Formulario para cambiar de fecha-->
+                    <div class="col-12 col-md-3 text-right">
+                        <h1 class="my-0">Fecha</h1>
+                        <form action="DoctorController" method="post">
+                            <div class="form-group row my-2">
+                                <div class="col">
+                                    <input type="date" name="date" class="form-control-lg" value="${date}" required>
+                                    <input type="hidden" name="doctorId" value="${profile.doctorId}">
+                                </div>
+                            </div>
+                            <div class="form-group row my-2">
+                                <div class="col">
+                                    <button type="submit" class="btn btn-info" name="action" value="changeDateDoctor">Cambiar Fecha</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="col-12 col-md-9 text-center">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Paciente</th>
+                                    <th scope="col">Tipo Consulta</th>
+                                    <th scope="col">Hora</th>
+                                    <th scope="col">Atender</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach var="a" items="${appDoc}">
+                                    <c:set var="status" value=""></c:set>
+                                    <c:if test="${a.status || a.isAvailable}">
+                                        <c:set var="status" value="disabled"></c:set>
+                                    </c:if>
+                                    <tr>
+                                        <th scope="row">${a.patientId}</th>
+                                        <td>${a.patientName}</td>
+                                        <td><span class="badge badge-success">${a.degree}</span></td>
+                                        <td>${a.time}</td>
+                                        <td><a href="DoctorController?action=${a.appointmentId}" class="btn btn-primary btn-sm ${status}">Crear Reporte</a></td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- Modal -->
+        <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Informaci&oacute;n</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Registro ingresado con exito.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <%@include file="js.html" %>
+        <c:if test="${success != null}">
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#reportModal').modal('show');
+                });
+            </script>        
+        </c:if>
     </body>
 </html>

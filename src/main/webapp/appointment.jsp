@@ -12,27 +12,28 @@
     <body>
 
         <!--NavBar-->
+        <jsp:include page="WEB-INF/navPatient.jsp"></jsp:include>
 
-        <!--Nueva cita-->
-        <section id="nueva-cita" class="my-4 py-2">
-            <div class="container">
+            <!--Nueva cita-->
+            <section id="nueva-cita" class="my-4 py-2">
+                <div class="container">
 
-                <div class="row text-center">
-                    <div class="col">
-                        <h2 class="text-primary">Agendar Cita Médica</h2>
+                    <div class="row text-center">
+                        <div class="col">
+                            <h2 class="text-primary">Agendar Cita Médica</h2>
+                        </div>
                     </div>
-                </div>
 
-                <div class="row my-3" id="row-especialidad">
-                    <div class="col">
-                        <form action="MainController" method="post">
-                            <div class="form-row align-items-center">
-                                <div class="col-auto ml-2">
-                                    <label for="specialties">Especialidad</label>
-                                </div>
-                                <div class="col-4 my-1">
-                                    <select class="custom-select mr-sm-2" id="inlineFormCustomSelect" name="specialties" required>
-                                        <option value="" selected>Choose...</option>
+                    <div class="row my-3" id="row-especialidad">
+                        <div class="col">
+                            <form action="MainController" method="post">
+                                <div class="form-row align-items-center">
+                                    <div class="col-auto ml-2">
+                                        <label for="specialties">Especialidad</label>
+                                    </div>
+                                    <div class="col-4 my-1">
+                                        <select class="custom-select mr-sm-2" id="inlineFormCustomSelect" name="specialties" required>
+                                            <option value="" selected>Choose...</option>
                                         <c:forEach var="s" items="${specialties}">
                                             <option value="${s.specialtyId}">${s.degree}</option>
                                         </c:forEach>
@@ -71,7 +72,7 @@
                                         <h5 class="card-title my-0">Dr. ${d.name}</h5>
                                         <c:forEach var="s" items="${d.specialties}">
                                             <p class="card-text my-0"><span class="badge badge-dark">${s.degree}</span></p>
-                                        </c:forEach>
+                                            </c:forEach>
                                     </div>
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item">Entrada: ${d.startTime}</li>

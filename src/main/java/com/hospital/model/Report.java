@@ -6,13 +6,14 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
+import javax.servlet.http.HttpServletRequest;
 import org.jdom2.Element;
 
 /**
  *
  * @author cesar31
  */
-public class Report implements Serializable{
+public class Report implements Serializable {
 
     private int reportId;
     private int appointmentId;
@@ -30,7 +31,7 @@ public class Report implements Serializable{
         this.date = ReadXml.getDate(e.getChildText("FECHA"));
         this.time = ReadXml.getTime(e.getChildText("HORA"));
     }
-    
+
     public Report(ResultSet rs) throws SQLException {
         this.reportId = rs.getInt("report_id");
         this.appointmentId = rs.getInt("appointment_id");
@@ -39,6 +40,15 @@ public class Report implements Serializable{
         this.report = rs.getString("report");
         this.date = rs.getDate("date");
         this.time = rs.getTime("time");
+    }
+
+    public Report(HttpServletRequest request) {
+        this.appointmentId = Integer.parseInt(request.getParameter("appointmentId"));
+        this.patientId = Integer.parseInt(request.getParameter("patientId"));
+        this.doctorId = request.getParameter("doctorId");
+        this.report = request.getParameter("report");
+        this.date = ReadXml.getDate(request.getParameter("date"));
+        this.time = ReadXml.getTime(request.getParameter("time"));
     }
 
     public Report(int reportId, int appointmentId, int patientId, Date date, Time time) {

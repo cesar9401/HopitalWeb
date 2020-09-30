@@ -49,12 +49,13 @@ public class AppointmentDao {
      * @param a
      */
     public void insertNewAppointment(Appointment a) {
-        String query = "INSERT INTO APPOINTMENTS(patient_id, doctor_id, date, time) VALUES(?, ?, ?, ?)";
+        String query = "INSERT INTO APPOINTMENTS(patient_id, doctor_id, specialty_id, date, time) VALUES(?, ?, ?, ?, ?)";
         try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setInt(1, a.getPatientId());
             pst.setString(2, a.getDoctorId());
-            pst.setDate(3, a.getDate());
-            pst.setTime(4, a.getTime());
+            pst.setInt(3, a.getSpecialtyId());
+            pst.setDate(4, a.getDate());
+            pst.setTime(5, a.getTime());
             pst.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
@@ -96,7 +97,9 @@ public class AppointmentDao {
         if (lab) {
             query = "SELECT * FROM APPOINTMENTS_LAB WHERE patient_id = ? AND status = ? ORDER BY date, time";
         } else {
-            query = "SELECT * FROM APPOINTMENTS WHERE patient_id = ? AND status = ? ORDER BY date, time";
+            query = "SELECT a.*, d.name AS doctor_name, s.degree, p.name AS patient_name FROM APPOINTMENTS a INNER JOIN DOCTORS d ON a.doctor_id = d.doctor_id "
+                    + "INNER JOIN SPECIALTIES s ON a.specialty_id = s.specialty_id INNER JOIN PATIENTS p ON a.patient_id = p.patient_id"
+                    + "WHERE a.patient_id = ? AND a.status = ? ORDER BY a.date, a.time;";
         }
         try (PreparedStatement pst = this.transaction.prepareStatement(query);) {
             pst.setInt(1, patientId);
@@ -123,7 +126,9 @@ public class AppointmentDao {
      */
     public List<Appointment> getAppointmentsByDoctor(String doctorId, java.sql.Date date, boolean lab) {
         List<Appointment> appointments = new ArrayList<>();
-        String query = "SELECT * FROM APPOINTMENTS WHERE doctor_id = ? AND date = ? ORDER BY time";
+        String query = "SELECT a.*, d.name AS doctor_name, s.degree, p.name AS patient_name FROM APPOINTMENTS a INNER JOIN DOCTORS d ON a.doctor_id = d.doctor_id "
+                + "INNER JOIN SPECIALTIES s ON a.specialty_id = s.specialty_id INNER JOIN PATIENTS p ON a.patient_id = p.patient_id "
+                + "WHERE a.doctor_id = ? AND a.date = ? ORDER BY time";
         try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setString(1, doctorId);
             pst.setDate(2, date);
@@ -137,23 +142,22 @@ public class AppointmentDao {
         return appointments;
     }
 
-    /**
-     * Metodo para obtener las citas de algún doctor
-     * @param doctorId
-     * @return 
-     */
-    public List<Appointment> getAllAppointmentsDoc(String doctorId) {
-        List<Appointment> appointments = new ArrayList<>();
-        String query = "SELECT * FROM APPOINTMENTS WHERE doctor_id = ? ORDER BY date, time";
+    public Appointment getAppointmentById(int appId) {
+        Appointment app = null;
+        String query = "SELECT a.*, d.name AS doctor_name, s.degree, p.name AS patient_name FROM APPOINTMENTS a INNER JOIN DOCTORS d ON a.doctor_id = d.doctor_id "
+                + "INNER JOIN SPECIALTIES s ON a.specialty_id = s.specialty_id INNER JOIN PATIENTS p ON a.patient_id = p.patient_id "
+                + "WHERE a.appointment_id = ? LIMIT 1";
+
         try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
-            pst.setString(1, doctorId);
-            ResultSet rs = pst.executeQuery();
-            while (rs.next()) {
-                appointments.add(new Appointment(rs, false));
+            pst.setInt(1, appId);
+            try (ResultSet rs = pst.executeQuery()) {
+                if(rs.next()) {
+                    app = new Appointment(rs, false);
+                }
             }
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
-        return appointments;
+        return app;
     }
 }

@@ -1,5 +1,6 @@
 package com.hospital.dao;
 
+import com.hospital.conexion.Conexion;
 import com.hospital.model.Report;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -30,7 +31,7 @@ public class ReportDao {
      */
     public void insertReport(Report r) {
         String query = "INSERT INTO REPORTS(report_id, patient_id, doctor_id, report, date, time) VALUES(?, ?, ?, ?, ?, ?)";
-        try ( PreparedStatement pst = this.transaction.prepareStatement(query)) {
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setInt(1, r.getReportId());
             //pst.setInt(2, r.getAppointmentId());
             pst.setInt(2, r.getPatientId());
@@ -45,17 +46,18 @@ public class ReportDao {
     }
 
     /**
-     * Metodo para obtener un listado de los informes a la base de 
+     * Metodo para obtener un listado de los informes a la base de
+     *
      * @param patientId
-     * @return 
+     * @return
      */
     public List<Report> getReportsByPatient(int patientId) {
         List<Report> reports = new ArrayList<>();
         String query = "SELECT * FROM REPORTS WHERE patient_id = ? ORDER BY date";
-        try ( PreparedStatement pst = this.transaction.prepareStatement(query)) {
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setInt(1, patientId);
             try (ResultSet rs = pst.executeQuery()) {
-                while(rs.next()) {
+                while (rs.next()) {
                     reports.add(new Report(rs));
                 }
             }
@@ -63,5 +65,37 @@ public class ReportDao {
             ex.printStackTrace(System.out);
         }
         return reports;
+    }
+
+    /**
+     * Metodo para insertar nuevo reporte y actualizar el estado de una cita
+     *
+     * @param r
+     */
+    public void createReport(Report r) {
+        String query = "INSERT INTO REPORTS(appointment_id, patient_id, doctor_id, report, date, time) VALUES(?, ?, ?, ?, ?, ?)";
+        String queryUpdate = "UPDATE APPOINTMENTS SET status = ? WHERE appointment_id = ?";
+        PreparedStatement pst = null;
+        try 
+        {
+            this.transaction.setAutoCommit(false);
+            pst = this.transaction.prepareStatement(query);
+            pst.executeUpdate();
+            
+            pst = this.transaction.prepareStatement(queryUpdate);
+            pst.setBoolean(1, true);
+            pst.setInt(2, r.getAppointmentId());
+            pst.executeUpdate();
+            this.transaction.commit();
+        } catch (SQLException ex) {
+            try {
+                ex.printStackTrace(System.out);
+                this.transaction.rollback();
+            } catch (SQLException ex1) {
+                ex1.printStackTrace(System.out);
+            }
+        } finally {
+            Conexion.close(pst);
+        }
     }
 }

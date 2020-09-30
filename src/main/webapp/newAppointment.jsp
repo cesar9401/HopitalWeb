@@ -12,19 +12,22 @@
     </head>
     <body>
 
-        <!--Titulo-->
-        <div class="container">
-            <div class="row my-4">
-                <div class="col text-center">
-                    <h1 class="text-success display-4">Nueva Cita</h1>
+        <!--NavBar-->
+        <jsp:include page="WEB-INF/navPatient.jsp"></jsp:include>
+
+            <!--Titulo-->
+            <div class="container">
+                <div class="row my-4">
+                    <div class="col text-center">
+                        <h1 class="text-success display-4">Agendar Cita</h1>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!--Datos doctor-->
-        <div class="jumbotron jumbotron-fluid">
-            <div class="container">
-                <h3 class="display-4 my-0">Dr. ${doctor.name}</h3>
+            <!--Datos doctor-->
+            <div class="jumbotron jumbotron-fluid">
+                <div class="container">
+                    <h3 class="display-4 my-0">Dr. ${doctor.name}</h3>
                 <p class="lead my-0">Horario: ${doctor.startTime} - ${doctor.endTime}</p>
                 <p class="lead my-0">Email: ${doctor.email}</p>
                 <c:forEach var="s" items="${doctor.specialties}">
@@ -57,7 +60,7 @@
                     </div>
 
                     <!--Formulario para agendar cita-->
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-7">
                         <form action="MainController" method="post">
                             <input type="hidden" name="doctorId" value="${doctor.doctorId}">
                             <input type="hidden" name="patientId" value="${profile.patientId}">
@@ -116,13 +119,6 @@
             </div>
         </section>
 
-        <!-- Button trigger modal -->
-        <!--
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-            Launch demo modal
-        </button>
-        -->
-
         <!-- Modal -->
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -142,7 +138,6 @@
                 </div>
             </div>
         </div>
-        <p>${success}</p>
         <%@include file="js.html" %>
         <c:if test="${success != null}">
             <script type="text/javascript">

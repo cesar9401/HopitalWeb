@@ -12,23 +12,27 @@ import org.jdom2.Element;
  *
  * @author cesar31
  */
-public class Appointment implements Serializable{
+public class Appointment implements Serializable {
 
     private int appointmentId;
     private int patientId;
     private String doctorId;
     private int examId;
-    private int specialty;
+    private int specialtyId;
     private Date date;
     private Time time;
     private boolean status;
     private boolean isAvailable;
 
+    private String degree;
+    private String doctorName;
+    private String patientName;
+
     public Appointment(java.sql.Time time, boolean isAvailable) {
         this.time = time;
         this.isAvailable = isAvailable;
     }
-    
+
     public Appointment(Element e) {
         this.appointmentId = Integer.parseInt(e.getChildText("CODIGO"));
         this.patientId = Integer.parseInt(e.getChildText("PACIENTE"));
@@ -36,13 +40,17 @@ public class Appointment implements Serializable{
         this.date = ReadXml.getDate(e.getChildText("FECHA"));
         this.time = ReadXml.getTime(e.getChildText("HORA"));
     }
-    
+
     public Appointment(ResultSet rs, boolean lab) throws SQLException {
-        if(lab) {
+        if (lab) {
             this.appointmentId = rs.getInt("appointment_lab_id");
             this.examId = rs.getInt("exam_id");
         } else {
             this.appointmentId = rs.getInt("appointment_id");
+            this.specialtyId = rs.getInt("specialty_id");
+            this.doctorName = rs.getString("doctor_name");
+            this.degree = rs.getString("degree");
+            this.patientName = rs.getString("patient_name");
         }
         this.patientId = rs.getInt("patient_id");
         this.doctorId = rs.getString("doctor_id");
@@ -51,11 +59,11 @@ public class Appointment implements Serializable{
         this.status = rs.getBoolean("status");
         this.isAvailable = false;
     }
-
-    public Appointment(int patientId, String doctorId, int specialty, Date date, Time time) {
+    
+    public Appointment(int patientId, String doctorId, int specialtyId, Date date, Time time) {
         this.patientId = patientId;
         this.doctorId = doctorId;
-        this.specialty = specialty;
+        this.specialtyId = specialtyId;
         this.date = date;
         this.time = time;
     }
@@ -124,16 +132,40 @@ public class Appointment implements Serializable{
         this.isAvailable = isAvailable;
     }
 
-    public int getSpecialty() {
-        return specialty;
+    public int getSpecialtyId() {
+        return specialtyId;
     }
 
-    public void setSpecialty(int specialty) {
-        this.specialty = specialty;
+    public void setSpecialtyId(int specialtyId) {
+        this.specialtyId = specialtyId;
     }
 
+    public String getDegree() {
+        return degree;
+    }
+
+    public void setDegree(String degree) {
+        this.degree = degree;
+    }
+
+    public String getDoctorName() {
+        return doctorName;
+    }
+
+    public void setDoctorName(String doctorName) {
+        this.doctorName = doctorName;
+    }
+
+    public String getPatientName() {
+        return patientName;
+    }
+
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
+    
     @Override
     public String toString() {
-        return "Appointment{" + "appointmentId=" + appointmentId + ", patientId=" + patientId + ", doctorId=" + doctorId + ", specialty=" + specialty + ", date=" + date + ", time=" + time + '}';
+        return "Appointment{" + "appointmentId=" + appointmentId + ", patientId=" + patientId + ", doctorId=" + doctorId + ", specialtyId=" + specialtyId + ", date=" + date + ", time=" + time + '}';
     }
 }
