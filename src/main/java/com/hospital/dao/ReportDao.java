@@ -80,6 +80,12 @@ public class ReportDao {
         {
             this.transaction.setAutoCommit(false);
             pst = this.transaction.prepareStatement(query);
+            pst.setInt(1, r.getAppointmentId());
+            pst.setInt(2, r.getPatientId());
+            pst.setString(3, r.getDoctorId());
+            pst.setString(4, r.getReport());
+            pst.setDate(5, r.getDate());
+            pst.setTime(6, r.getTime());
             pst.executeUpdate();
             
             pst = this.transaction.prepareStatement(queryUpdate);

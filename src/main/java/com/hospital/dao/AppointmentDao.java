@@ -29,14 +29,17 @@ public class AppointmentDao {
      * @param a
      */
     public void insertAppointment(Appointment a) {
-        String query = "INSERT INTO APPOINTMENTS(appointment_id, patient_id, doctor_id, date, time, status) VALUES(?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO APPOINTMENTS(appointment_id, patient_id, doctor_id, specialty_id, date, time, status) VALUES(?, ?, ?, "
+                + "(SELECT specialty_id FROM SPECIALTIES WHERE degree = ? LIMIT 1)"
+                + ", ?, ?, ?)";
         try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setInt(1, a.getAppointmentId());
             pst.setInt(2, a.getPatientId());
             pst.setString(3, a.getDoctorId());
-            pst.setDate(4, a.getDate());
-            pst.setTime(5, a.getTime());
-            pst.setBoolean(6, a.isStatus());
+            pst.setString(4, a.getDegree());
+            pst.setDate(5, a.getDate());
+            pst.setTime(6, a.getTime());
+            pst.setBoolean(7, a.isStatus());
             pst.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
@@ -98,8 +101,8 @@ public class AppointmentDao {
             query = "SELECT * FROM APPOINTMENTS_LAB WHERE patient_id = ? AND status = ? ORDER BY date, time";
         } else {
             query = "SELECT a.*, d.name AS doctor_name, s.degree, p.name AS patient_name FROM APPOINTMENTS a INNER JOIN DOCTORS d ON a.doctor_id = d.doctor_id "
-                    + "INNER JOIN SPECIALTIES s ON a.specialty_id = s.specialty_id INNER JOIN PATIENTS p ON a.patient_id = p.patient_id"
-                    + "WHERE a.patient_id = ? AND a.status = ? ORDER BY a.date, a.time;";
+                    + "INNER JOIN SPECIALTIES s ON a.specialty_id = s.specialty_id INNER JOIN PATIENTS p ON a.patient_id = p.patient_id "
+                    + "WHERE a.patient_id = ? AND a.status = ? ORDER BY date, time";
         }
         try (PreparedStatement pst = this.transaction.prepareStatement(query);) {
             pst.setInt(1, patientId);

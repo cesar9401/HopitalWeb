@@ -27,7 +27,7 @@ public class AdministratorDao {
      */
     public void insertDays() {
         String query = "INSERT INTO DAYS(day_id, name_day) VALUES(?, ?)";
-        try ( PreparedStatement pst = this.transaction.prepareStatement(query)) {
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             for (Day day : Day.values()) {
                 pst.setInt(1, day.getDayId());
                 pst.setString(2, day.getDay());
@@ -40,12 +40,13 @@ public class AdministratorDao {
 
     /**
      * Metodo para insertar un nuevo administrador
-     * @param admin 
+     *
+     * @param admin
      */
     public void insertAdministrator(Administrator admin) {
         String query = "INSERT INTO ADMINISTRATORS(admin_id, dpi, name, password) VALUES(?, ?, ?, ?)";
 
-        try ( PreparedStatement pst = this.transaction.prepareStatement(query)) {
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setString(1, admin.getAdminId());
             pst.setString(2, admin.getDpi());
             pst.setString(3, admin.getName());
@@ -58,17 +59,18 @@ public class AdministratorDao {
 
     /**
      * Metodo para obtener un administrador segun su codigo y password
+     *
      * @param adminId
      * @param pass
-     * @return 
+     * @return
      */
     public Administrator getAdminById(String adminId, String pass) {
         Administrator admin = null;
         String query = "SELECT * FROM ADMINISTRATORS WHERE admin_id = ? AND password = ?";
-        try ( PreparedStatement pst = this.transaction.prepareStatement(query)) {
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setString(1, adminId);
             pst.setString(2, pass);
-            try ( ResultSet rs = pst.executeQuery()) {
+            try (ResultSet rs = pst.executeQuery()) {
                 if (rs.next()) {
                     admin = new Administrator(rs.getString("admin_id"), rs.getString("dpi"), rs.getString("name"), rs.getString("password"));
                 }
@@ -77,6 +79,22 @@ public class AdministratorDao {
             ex.printStackTrace(System.out);
         }
 
+        return admin;
+    }
+
+    public Administrator getAdmin(String adminId) {
+        Administrator admin = null;
+        String query = "SELECT * FROM ADMINISTRATORS WHERE admin_id = ?";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setString(1, adminId);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    admin = new Administrator(rs.getString("admin_id"), rs.getString("dpi"), rs.getString("name"), rs.getString("password"));
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
         return admin;
     }
 }

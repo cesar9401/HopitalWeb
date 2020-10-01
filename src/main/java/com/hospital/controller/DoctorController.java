@@ -5,6 +5,7 @@ import com.hospital.model.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -24,6 +25,7 @@ public class DoctorController extends HttpServlet {
     private final AppointmentDao appointmentDao = new AppointmentDao(conexion);
     private final PatientDao patientDao = new PatientDao(conexion);
     private final ReportDao reportDao = new ReportDao(conexion);
+    private final SpecialtyDao specialtyDao = new SpecialtyDao(conexion);
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -65,11 +67,20 @@ public class DoctorController extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getParameter("action");
         switch (action) {
+            //Redirigir al perfil del doctor
             case "myProfile":
                 String doctorId = (String) request.getSession().getAttribute("user");
                 Doctor doctor = doctorDao.getDoctor(doctorId);
                 request.getSession().setAttribute("success", null);
                 main.setProfileDoctor(request, response, doctor);
+                break;
+            //Especialidades para editar por admin
+            case "specialties":
+                setSpecialtiesAdmin(request, response);
+                break;
+            //Examenes para editar por admin
+            case "exams":
+                setExamsAdmin(request, response);
                 break;
             default:
                 setReportePatient(request, response);
@@ -77,6 +88,14 @@ public class DoctorController extends HttpServlet {
         }
     }
 
+    /**
+     * Redirigir a la vista donde se escribira el informe de un paciente
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     private void setReportePatient(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int appId = Integer.parseInt(request.getParameter("action"));
         Appointment app = appointmentDao.getAppointmentById(appId);
@@ -86,6 +105,30 @@ public class DoctorController extends HttpServlet {
         request.getSession().setAttribute("appointment", app);
         request.getSession().setAttribute("patient", patient);
         request.getRequestDispatcher("reportPatient.jsp").forward(request, response);
+    }
+
+    /**
+     * Metodo para obtener las espcialidades del hospital y poder editarlas por
+     * el administrador
+     *
+     * @param request
+     * @param response
+     */
+    private void setSpecialtiesAdmin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        List<Specialty> specialties = specialtyDao.getSpecialties(false);
+        request.getSession().setAttribute("specialties", specialties);
+        request.getRequestDispatcher("specialties.jsp").forward(request, response);
+    }
+
+    /**
+     * Metodo para obtener los examenes del hospital y poder editarlos por el
+     * administrador
+     *
+     * @param request
+     * @param response
+     */
+    private void setExamsAdmin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("exams.jps").forward(request, response);
     }
 
     /**
@@ -101,6 +144,7 @@ public class DoctorController extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getParameter("action");
         switch (action) {
+            //Cambiar fecha del doctor
             case "changeDateDoctor":
                 String fecha = request.getParameter("date");
                 String doctorId = request.getParameter("doctorId");
@@ -110,20 +154,64 @@ public class DoctorController extends HttpServlet {
                 Doctor doctor = doctorDao.getDoctor(doctorId);
                 main.setProfileDoctor(request, response, doctor);
                 break;
-
+            //Crear informe del doctor
             case "newReport":
                 createReport(request, response);
+                break;
+            //Buscar especialidades para editar
+            case "searchSpecialties":
+                searchSpecialties(request, response);
+                break;
+            case "editSpecialty":
+                editSpecialty(request, response);
                 break;
         }
     }
 
+    /**
+     * Metodo para que recibe el informe de un paciente y lo envia a la base de
+     * datos
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     private void createReport(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Report report = new Report(request);
         System.out.println(report.toString());
-        //reportDao.createReport(report);
+        reportDao.createReport(report);
         request.getSession().setAttribute("success", true);
         Doctor doctor = doctorDao.getDoctor(report.getDoctorId());
         main.setProfileDoctor(request, response, doctor);
+    }
+
+    /**
+     * Metodo para buscar reportes y editarlos
+     *
+     * @param request
+     * @param response
+     */
+    private void searchSpecialties(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int option = Integer.parseInt(request.getParameter("kind"));
+        List<Specialty> specialties;
+        if (option == 0) {
+            String degree = request.getParameter("search");
+            specialties = specialtyDao.getSpecialtiesByName(degree);
+        } else {
+            Double precio = Double.parseDouble(request.getParameter("search"));
+            specialties = specialtyDao.getSpecialtiesByPrice(option, precio);
+        }
+        request.getSession().setAttribute("specialties", specialties);
+        request.getRequestDispatcher("specialties.jsp").forward(request, response);
+    }
+
+    private void editSpecialty(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Specialty tmp = new Specialty(request);
+        specialtyDao.updateSpecialty(tmp);
+        request.setAttribute("update", tmp);
+        System.out.println(tmp.toString());
+        setSpecialtiesAdmin(request, response);
     }
 
     /**
@@ -135,5 +223,4 @@ public class DoctorController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }

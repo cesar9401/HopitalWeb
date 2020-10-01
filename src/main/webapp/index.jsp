@@ -24,13 +24,13 @@
                 </div>
                 <div class="derecha">
                     <form action="MainController" method="post" class="formulario" id="formulario" name="form1" onsubmit="return validarFormulario(this)">
-                        <input type="email" id="email" class="input" name="email" placeholder="Email" value="mail123@hospital.com" required="">
+                        <input type="email" id="email" class="input" name="email" placeholder="Email" value="ADMIN10" required>
                         <br />
-                        <input type="password" name="pass" id="pass" class="input" name="pass" placeholder="Contraseña" value="~fc,X,9;" required>
+                        <input type="password" name="pass" id="pass" class="input" name="pass" placeholder="Contraseña" value="{}$nj-4WJdub)Qh*@[QV" required>
                         <br />
                         <select name="tipoUsuario" class="input lista" id="lista">
                             <option value="PATIENTS">Paciente</option>
-                            <option value="DOCTORS" selected>Doctor</option>
+                            <option value="DOCTORS">Doctor</option>
                             <option value="LAB_WORKERS">Laboratorista</option>
                             <option value="ADMINISTRATORS">Administrador</option>
                         </select>

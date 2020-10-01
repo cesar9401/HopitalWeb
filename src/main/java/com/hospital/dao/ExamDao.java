@@ -50,7 +50,7 @@ public class ExamDao {
      */
     public List<Exam> getExams() {
         List<Exam> exams = new ArrayList<>();
-        String query = "SELECT * FROM EXAMS";
+        String query = "SELECT * FROM EXAMS ORDER BY RAND() LIMIT 6";
         try ( PreparedStatement pst = this.transaction.prepareStatement(query);  ResultSet rs = pst.executeQuery()) {
             while (rs.next()) {
                 exams.add(new Exam(rs));

@@ -117,6 +117,6 @@ public class Report implements Serializable {
 
     @Override
     public String toString() {
-        return "Report{" + "reportId=" + reportId + ", patientId=" + patientId + ", doctorId=" + doctorId + ", report=" + report + ", date=" + date + ", time=" + time + '}';
+        return "Report{" + "reportId=" + reportId + ", appointmentId=" + appointmentId + ", patientId=" + patientId + ", doctorId=" + doctorId + ", report=" + report + ", date=" + date + ", time=" + time + '}';
     }
 }

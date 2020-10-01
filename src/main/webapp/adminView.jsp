@@ -11,53 +11,17 @@
 <%@page import="com.hospital.model.Administrator"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%
-    //String user = (String) session.getAttribute("user");
-    //Administrator a = (Administrator) session.getAttribute("profile");
-    //List<Specialty> specialties = (List<Specialty>) session.getAttribute("specialties");
-    //List<Exam> exams = (List<Exam>) session.getAttribute("exams");
-%>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <%@include file="css.html"%>
-        <title>Admin - PASTEUR</title>
+        <title>Administrador - ${profile.name}</title>
     </head>
     <body data-spy="scroll" data-target="#navbarNavDropdown" data-offset="57">
 
         <!--NavBar-->
-        <nav class="navbar navbar-expand-lg navbar-light sticky-top">
-            <div class="container">
-                <a class="navbar-brand" href="#">Inicio</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#specialties">Especialidades <span class="sr-only">(current)</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#exams">Examenes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Pricing</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Cuenta
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <a class="dropdown-item" href="#">Action</a>
-                                <a class="dropdown-item" href="#">Another action</a>
-                                <a class="dropdown-item" href="MainController?action=singOff">Cerrar Sesion</a>
-                            </div>
-                        </li>
-                    </ul>
-                </div>           
-            </div>
-        </nav>
+        <jsp:include page="WEB-INF/navAdmin.jsp"></jsp:include>
 
         <!--Info profile-->
         <div class="jumbotron">
@@ -76,8 +40,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col text-center">
-                        <h1>Especialidades</h1>
-                        <h2>Disponibles</h2>
+                        <h1 class="display-4 text-success">Especialidades</h1>
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -92,7 +55,6 @@
                                 <div class="card-body">
                                     <h4 class="card-title"><span class="font-weight-bold">Especialidad: </span>${e.degree}</h4>
                                     <p class="card-text"><span class="font-weight-bold">Precio: </span>Q.${e.priceConsultation}</p>
-                                    <a href="#" class="btn btn-primary">Editar</a>
                                 </div>
                             </div>
                         </div>
@@ -100,13 +62,14 @@
                 </div>
             </div>
         </section>
+        <hr/>
 
         <!--Exams-->
         <section id="exams" class="mt-4 mb-4">
             <div class="contanier">
                 <div class="row">
                     <div class="col text-center">
-                        <h1 class="display-3">Examenes</h1>
+                        <h1 class="display-3 text-info">Examenes</h1>
                     </div>
                 </div>
                 <div class="container">

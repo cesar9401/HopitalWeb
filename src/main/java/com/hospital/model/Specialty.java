@@ -3,13 +3,14 @@ package com.hospital.model;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.servlet.http.HttpServletRequest;
 import org.jdom2.Element;
 
 /**
  *
  * @author cesar31
  */
-public class Specialty implements Serializable{
+public class Specialty implements Serializable {
 
     private int specialtyId;
     private String degree;
@@ -21,16 +22,22 @@ public class Specialty implements Serializable{
 
     public Specialty() {
     }
-    
+
     public Specialty(Element e) {
         this.degree = e.getChildText("TIPO");
         this.priceConsultation = Double.parseDouble(e.getChildText("COSTO"));
     }
-    
+
     public Specialty(ResultSet rs) throws SQLException {
         this.specialtyId = rs.getInt("specialty_id");
         this.degree = rs.getString("degree");
         this.priceConsultation = rs.getDouble("price_consultation");
+    }
+
+    public Specialty(HttpServletRequest request) {
+        this.specialtyId = Integer.parseInt(request.getParameter("specialtyId"));
+        this.degree = request.getParameter("degree");
+        this.priceConsultation = Double.parseDouble(request.getParameter("price"));
     }
 
     public Specialty(String degree) {

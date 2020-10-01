@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
+import javax.servlet.http.HttpServletRequest;
 import org.jdom2.Element;
 
 /**
@@ -39,6 +40,8 @@ public class Appointment implements Serializable {
         this.doctorId = e.getChildText("MEDICO");
         this.date = ReadXml.getDate(e.getChildText("FECHA"));
         this.time = ReadXml.getTime(e.getChildText("HORA"));
+        //Sujeto a cambios
+        this.degree = e.getChildText("TIPO");
     }
 
     public Appointment(ResultSet rs, boolean lab) throws SQLException {
@@ -59,7 +62,19 @@ public class Appointment implements Serializable {
         this.status = rs.getBoolean("status");
         this.isAvailable = false;
     }
-    
+
+    public Appointment(HttpServletRequest request, boolean lab) {
+        this.doctorId = request.getParameter("doctorId");
+        this.patientId = Integer.parseInt(request.getParameter("patientId"));
+        this.specialtyId = Integer.parseInt(request.getParameter("specialty"));
+        this.time = ReadXml.getTime(request.getParameter("AppTime"));
+        this.date = (java.sql.Date) request.getSession().getAttribute("date");
+        
+        if(lab) {
+            System.out.println("lab");
+        }
+    }
+
     public Appointment(int patientId, String doctorId, int specialtyId, Date date, Time time) {
         this.patientId = patientId;
         this.doctorId = doctorId;
@@ -163,7 +178,7 @@ public class Appointment implements Serializable {
     public void setPatientName(String patientName) {
         this.patientName = patientName;
     }
-    
+
     @Override
     public String toString() {
         return "Appointment{" + "appointmentId=" + appointmentId + ", patientId=" + patientId + ", doctorId=" + doctorId + ", specialtyId=" + specialtyId + ", date=" + date + ", time=" + time + '}';

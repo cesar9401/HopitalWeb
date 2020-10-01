@@ -42,7 +42,7 @@
                 <div class="row my-4 align-items-center">
 
                     <!--Formulario para cambiar fecha-->
-                    <div class="col-12 col-md-4 offset-md-1 text-right">
+                    <div class="col-12 col-md-4 text-right">
                         <h1 class="display-3 my-0">Citas</h1>
                         <form action="MainController" method="post">
                             <div class="form-group row my-2">
@@ -60,7 +60,7 @@
                     </div>
 
                     <!--Formulario para agendar cita-->
-                    <div class="col-12 col-md-7">
+                    <div class="col-12 col-md-8">
                         <form action="MainController" method="post">
                             <input type="hidden" name="doctorId" value="${doctor.doctorId}">
                             <input type="hidden" name="patientId" value="${profile.patientId}">
