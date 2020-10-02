@@ -33,3 +33,4 @@ function validarFormulario(formulario) {
     
     return true;
 }
+

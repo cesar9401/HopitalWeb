@@ -285,7 +285,7 @@ public class MainController extends HttpServlet {
      */
     private void setProfileAdmin(HttpServletRequest request, HttpServletResponse response, Administrator a) throws ServletException, IOException {
         List<Specialty> specialties = specialtyDao.getSpecialties(true);
-        List<Exam> exams = examDao.getExams();
+        List<Exam> exams = examDao.getExams(true);
 
         request.getSession().setAttribute("user", a.getAdminId());
         request.getSession().setAttribute("profile", a);

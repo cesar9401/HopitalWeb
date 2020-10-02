@@ -2,6 +2,7 @@ package com.hospital.model;
 
 import com.hospital.controller.ReadXml;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,11 +43,11 @@ public class Report implements Serializable {
         this.time = rs.getTime("time");
     }
 
-    public Report(HttpServletRequest request) {
+    public Report(HttpServletRequest request) throws UnsupportedEncodingException {
         this.appointmentId = Integer.parseInt(request.getParameter("appointmentId"));
         this.patientId = Integer.parseInt(request.getParameter("patientId"));
         this.doctorId = request.getParameter("doctorId");
-        this.report = request.getParameter("report");
+        this.report = new String(request.getParameter("report").getBytes("ISO-8859-1"), "UTF-8");
         this.date = ReadXml.getDate(request.getParameter("date"));
         this.time = ReadXml.getTime(request.getParameter("time"));
     }

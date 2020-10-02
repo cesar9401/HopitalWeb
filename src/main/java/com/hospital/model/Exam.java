@@ -1,8 +1,10 @@
 package com.hospital.model;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.servlet.http.HttpServletRequest;
 import org.jdom2.Element;
 
 /**
@@ -25,6 +27,15 @@ public class Exam implements Serializable{
         this.description = e.getChildText("DESCRIPCION");
         this.price = Double.parseDouble(e.getChildText("COSTO"));
         this.report = e.getChildText("INFORME").equals("PDF");
+    }
+    
+    public Exam(HttpServletRequest request) throws UnsupportedEncodingException {
+        this.examId = Integer.parseInt(request.getParameter("examId"));
+        this.name = new String(request.getParameter("name").getBytes("ISO-8859-1"), "UTF8");
+        this.order = request.getParameter("order").equals("true");
+        this.description = new String(request.getParameter("description").getBytes("ISO-8859-1"), "UTF-8");
+        this.price = Double.parseDouble(request.getParameter("price"));
+        this.report = request.getParameter("report").equals("true");
     }
 
     public Exam(int examId, String name, boolean order, Double price) {
@@ -93,6 +104,6 @@ public class Exam implements Serializable{
 
     @Override
     public String toString() {
-        return "Exam{" + "examId=" + examId + ", name=" + name + ", order=" + order + ", description=" + description + ", price=" + price + ", report=" + report + '}';
+        return "Exam{" + "examId=" + examId + ", name=" + name + ", order=" + order + ", price=" + price + ", report=" + report + '}';
     }
 }

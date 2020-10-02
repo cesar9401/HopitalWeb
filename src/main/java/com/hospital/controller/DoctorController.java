@@ -26,6 +26,7 @@ public class DoctorController extends HttpServlet {
     private final PatientDao patientDao = new PatientDao(conexion);
     private final ReportDao reportDao = new ReportDao(conexion);
     private final SpecialtyDao specialtyDao = new SpecialtyDao(conexion);
+    private final ExamDao examDao = new ExamDao(conexion);
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -82,6 +83,10 @@ public class DoctorController extends HttpServlet {
             case "exams":
                 setExamsAdmin(request, response);
                 break;
+            case "doctors":
+                setDoctorsAdmin(request, response);
+                break;
+            //Redirige hacia jsp para escribir informe del paciente
             default:
                 setReportePatient(request, response);
                 break;
@@ -128,7 +133,28 @@ public class DoctorController extends HttpServlet {
      * @param response
      */
     private void setExamsAdmin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("exams.jps").forward(request, response);
+        List<Exam> exams = examDao.getExams(false);
+        request.getSession().setAttribute("exams", exams);
+        request.getRequestDispatcher("exams.jsp").forward(request, response);
+    }
+
+    /**
+     * Metodo para llevar la informacion de los doctores a la vista del
+     * administrador
+     *
+     * @param request
+     * @param response
+     */
+    private void setDoctorsAdmin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        List<Doctor> doctors = doctorDao.getDoctors();
+        for(Doctor d : doctors) {
+            d.setSpecialties(specialtyDao.getSpecialtiesByDoctor(d.getDoctorId()));
+        }
+        List<Specialty> specialties = specialtyDao.getSpecialties(false);
+        
+        request.setAttribute("specialty", specialties);
+        request.setAttribute("doctors", doctors);
+        request.getRequestDispatcher("doctors.jsp").forward(request, response);
     }
 
     /**
@@ -144,8 +170,8 @@ public class DoctorController extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getParameter("action");
         switch (action) {
-            //Cambiar fecha del doctor
             case "changeDateDoctor":
+                //Cambiar fecha del doctor
                 String fecha = request.getParameter("date");
                 String doctorId = request.getParameter("doctorId");
                 java.sql.Date date = ReadXml.getDate(fecha);
@@ -154,16 +180,27 @@ public class DoctorController extends HttpServlet {
                 Doctor doctor = doctorDao.getDoctor(doctorId);
                 main.setProfileDoctor(request, response, doctor);
                 break;
-            //Crear informe del doctor
             case "newReport":
+                //Crear informe para un paciente
                 createReport(request, response);
                 break;
-            //Buscar especialidades para editar
             case "searchSpecialties":
+                //Buscar especialidades para editar
                 searchSpecialties(request, response);
                 break;
             case "editSpecialty":
+                //Editar especialidades
                 editSpecialty(request, response);
+            case "searchExams":
+                //Buscar examenes para editar
+                searchExams(request, response);
+                break;
+            case "editExam":
+                //Editar examenes
+                editExam(request, response);
+                break;
+            case "newExam":
+                newExam(request, response);
                 break;
         }
     }
@@ -206,12 +243,60 @@ public class DoctorController extends HttpServlet {
         request.getRequestDispatcher("specialties.jsp").forward(request, response);
     }
 
+    /**
+     * Metodo que recibe la informacion de una especialidad que se va a
+     * actualizar
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     private void editSpecialty(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Specialty tmp = new Specialty(request);
         specialtyDao.updateSpecialty(tmp);
         request.setAttribute("update", tmp);
-        System.out.println(tmp.toString());
         setSpecialtiesAdmin(request, response);
+    }
+
+    /**
+     * Metodo para buscar examenes para poder editarlos
+     *
+     * @param request
+     * @param response
+     */
+    private void searchExams(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int option = Integer.parseInt(request.getParameter("kind"));
+        List<Exam> exams;
+        if (option == 0) {
+            String name = request.getParameter("search");
+            exams = examDao.getExamsByName(name);
+        } else {
+            Double precio = Double.parseDouble(request.getParameter("search"));
+            exams = examDao.getExamsByPrice(option, precio);
+        }
+        request.getSession().setAttribute("exams", exams);
+        request.getRequestDispatcher("exams.jsp").forward(request, response);
+    }
+
+    /**
+     * Metodo que recibe la informacion de un examne que se va a actualizar
+     *
+     * @param request
+     * @param response
+     */
+    private void editExam(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Exam tmp = new Exam(request);
+        examDao.updateExam(tmp);
+        request.setAttribute("examUp", tmp.getName());
+        setExamsAdmin(request, response);
+    }
+
+    private void newExam(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Exam tmp = new Exam(request);
+        examDao.createExam(tmp);
+        request.setAttribute("newEx", tmp.getName());
+        setExamsAdmin(request, response);
     }
 
     /**

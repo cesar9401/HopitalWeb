@@ -41,17 +41,17 @@
                         </form>
                     </div>
                 </div>
-
             </div>
 
+            <!--Especialidades-->
             <section id="spacialties">
                 <div class="container">
                     <div class="row">
                     <c:forEach var="s" items="${specialties}">
-                        <div class="col-12 col-md-4 my-3">
+                        <div class="col-12 col-md-6 col-lg-4 my-3">
                             <div class="card">
                                 <div class="card-header text-center">
-                                    <h3>${s.degree}</h3>
+                                    <h3 class="text-info">${s.degree}</h3>
                                 </div>
                                 <ul class="list-group list-group-flush">
                                     <li class="list-group-item text-center"><span class="font-weight-bold">Precio: Q</span>${s.priceConsultation}</li>
@@ -84,7 +84,7 @@
                                 <input type="hidden" id="specialtyId" name="specialtyId">
                             </div>
                             <div class="form-group">
-                                <label for="exampleInputPassword1">Precio Q.</label>
+                                <label for="price">Precio Q.</label>
                                 <input type="number" step="any" min="0" class="form-control" id="price" name="price" placeholder="Precio Q." required>
                             </div>
                             <button type="submit" class="btn btn-primary" name="action" value="editSpecialty">Editar</button>
@@ -112,39 +112,13 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <%@include file="js.html" %>
-        <script type="text/javascript">
-            window.onload = function () {
-                var lista = document.getElementById('inputType');
-                var input = document.getElementById('inputSearch');
-                lista.addEventListener('change', () => {
-                    if (lista.value === "0") {
-                        input.setAttribute("type", "text");
-                        input.setAttribute("placeholder", "Especialidad");
-                        input.removeAttribute("step");
-                        input.removeAttribute("min");
-                    } else {
-                        input.setAttribute("type", "number");
-                        input.setAttribute("placeholder", "Precio Q.");
-                        input.setAttribute("step", "any");
-                        input.setAttribute("min", "0");
-                    }
-                });
-            };
-
-            setSpecialty = function (id, degree, price) {
-                $('#specialtyId').val(id);
-                $('#degree').val(degree);
-                $('#price').val(price);
-            };
-        </script>
-
+        <script type="text/javascript" src="js/script.js"></script>
         <c:if test="${update != null}">
             <script type="text/javascript">
                 $(document).ready(function () {

@@ -1,6 +1,7 @@
 package com.hospital.model;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
@@ -34,9 +35,9 @@ public class Specialty implements Serializable {
         this.priceConsultation = rs.getDouble("price_consultation");
     }
 
-    public Specialty(HttpServletRequest request) {
+    public Specialty(HttpServletRequest request) throws UnsupportedEncodingException {
         this.specialtyId = Integer.parseInt(request.getParameter("specialtyId"));
-        this.degree = request.getParameter("degree");
+        this.degree = new String(request.getParameter("degree").getBytes("ISO-8859-1"), "UTF-8");
         this.priceConsultation = Double.parseDouble(request.getParameter("price"));
     }
 

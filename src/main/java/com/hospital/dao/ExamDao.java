@@ -30,7 +30,7 @@ public class ExamDao {
      */
     public void insertExam(Exam e) {
         String query = "INSERT INTO EXAMS(exam_id, name, exam_order, description, price, report) VALUES(?, ?, ?, ?, ?, ?)";
-        try ( PreparedStatement pst = this.transaction.prepareStatement(query)) {
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setInt(1, e.getExamId());
             pst.setString(2, e.getName());
             pst.setBoolean(3, e.isOrder());
@@ -44,14 +44,54 @@ public class ExamDao {
     }
 
     /**
+     * Metodo para agregar un nuevo examen a la base de datos
+     *
+     * @param e
+     */
+    public void createExam(Exam e) {
+        String query = "INSERT INTO EXAMS(name, exam_order, description, price, report) VALUES(?, ?, ?, ?, ?)";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setString(1, e.getName());
+            pst.setBoolean(2, e.isOrder());
+            pst.setString(3, e.getDescription());
+            pst.setDouble(4, e.getPrice());
+            pst.setBoolean(5, e.isReport());
+            pst.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+    }
+
+    /**
+     * Metodo para actualizar informacion de un examen
+     *
+     * @param e
+     */
+    public void updateExam(Exam e) {
+        String query = "UPDATE EXAMS SET name = ?, exam_order = ?, description = ?, price = ?, report = ? WHERE exam_id = ?";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setString(1, e.getName());
+            pst.setBoolean(2, e.isOrder());
+            pst.setString(3, e.getDescription());
+            pst.setDouble(4, e.getPrice());
+            pst.setBoolean(5, e.isReport());
+            pst.setInt(6, e.getExamId());
+            pst.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+    }
+
+    /**
      * Metodo para obtener listado de examenes
      *
+     * @param random
      * @return
      */
-    public List<Exam> getExams() {
+    public List<Exam> getExams(boolean random) {
         List<Exam> exams = new ArrayList<>();
-        String query = "SELECT * FROM EXAMS ORDER BY RAND() LIMIT 6";
-        try ( PreparedStatement pst = this.transaction.prepareStatement(query);  ResultSet rs = pst.executeQuery()) {
+        String query = random ? "SELECT * FROM EXAMS ORDER BY RAND() LIMIT 6" : "SELECT * FROM EXAMS";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query); ResultSet rs = pst.executeQuery()) {
             while (rs.next()) {
                 exams.add(new Exam(rs));
             }
@@ -61,4 +101,55 @@ public class ExamDao {
 
         return exams;
     }
+
+    /**
+     * Metodo para obtener listado de examenes segun su nombre
+     *
+     * @param name
+     * @return
+     */
+    public List<Exam> getExamsByName(String name) {
+        String str = "%" + name + "%";
+        List<Exam> exams = new ArrayList<>();
+        String query = "SELECT * FROM EXAMS WHERE name LIKE ?";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setString(1, str);
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    exams.add(new Exam(rs));
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        return exams;
+    }
+
+    public List<Exam> getExamsByPrice(int option, Double price) {
+        List<Exam> exams = new ArrayList<>();
+        String query = "SELECT * FROM EXAMS WHERE price";
+        switch (option) {
+            case 1:
+                query += " = ?";
+                break;
+            case 2:
+                query += " >= ?";
+                break;
+            case 3:
+                query += " <= ?";
+                break;
+        }
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setDouble(1, price);
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    exams.add(new Exam(rs));
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        return exams;
+    }
+
 }
