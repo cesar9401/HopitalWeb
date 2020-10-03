@@ -84,28 +84,36 @@ public class MainController extends HttpServlet {
         System.out.println("action = " + action);
         switch (action) {
             case "singOff":
+                //Cerrar Sesion
                 HttpSession session = request.getSession();
                 session.invalidate();
                 request.getRequestDispatcher("index.jsp").forward(request, response);
                 //response.sendRedirect("index.jsp");
                 break;
             case "newAppointment":
+                //Nueva cita
                 List<Doctor> doctors = doctorDao.getDoctors();
                 request.getSession().setAttribute("doctors", doctors);
                 request.getRequestDispatcher("appointment.jsp").forward(request, response);
                 break;
             case "myProfile":
+                //Perfil del paciente
                 int patientId = (int) request.getSession().getAttribute("user");
                 Patient p = patientDao.getPatientById(patientId);
                 setProfilePatient(request, response, p);
                 break;
-
             case "adminProfile":
+                //Perfil del admin
                 String adminId = (String) request.getSession().getAttribute("user");
                 Administrator a = administratorDao.getAdmin(adminId);
                 setProfileAdmin(request, response, a);
                 break;
-
+            case "labProfile":
+                //Perfil del laboratorista
+                String labId = (String) request.getSession().getAttribute("user");
+                LabWorker lab = labWorkerDao.getLabWorkerById(labId);
+                setProfileLabWorker(request, response, lab);
+                break;
             default:
                 String doctorId = action;
                 java.sql.Date date = (java.sql.Date) request.getSession().getAttribute("date");
@@ -253,9 +261,9 @@ public class MainController extends HttpServlet {
                 }
                 break;
             case "LAB_WORKERS":
-                LabWorker l = labWorkerDao.getLabWorker(email, pass);
-                if (l != null) {
-                    System.out.println(l.toString());
+                LabWorker labWorker = labWorkerDao.getLabWorker(email, pass);
+                if (labWorker != null) {
+                    setProfileLabWorker(request, response, labWorker);
                 } else {
                     setErrorLogin(request, response);
 
@@ -344,6 +352,18 @@ public class MainController extends HttpServlet {
         List<Appointment> appointments = getAppointmentsByDoctor(doctor, date, false);
         request.getSession().setAttribute("appDoc", appointments);
         request.getRequestDispatcher("doctorView.jsp").forward(request, response);
+    }
+    
+    /**
+     * Metodo para dirigir al perfil del laboratorista
+     * @param request
+     * @param response
+     * @param labWorker 
+     */
+    private void setProfileLabWorker(HttpServletRequest request, HttpServletResponse response, LabWorker labWorker) throws ServletException, IOException {
+        request.getSession().setAttribute("user", labWorker.getLabWorkerId());
+        request.getSession().setAttribute("profile", labWorker);
+        request.getRequestDispatcher("labWorkerView.jsp").forward(request, response);
     }
 
     /**

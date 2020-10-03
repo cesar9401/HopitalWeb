@@ -30,7 +30,7 @@ public class LabWorker extends Person {
         List<Element> elChild = el.getChildren();
         for (Element i : elChild) {
             days.add(Day.valueOf(i.getText()));
-        }
+            }
         this.startDate = ReadXml.getDate(e.getContent(17).getValue());
     }
     
@@ -40,11 +40,20 @@ public class LabWorker extends Person {
         this.registry = rs.getString("registry_number");
         this.startDate = rs.getDate("start_date");
         this.examId = rs.getInt("exam_id");
+        String d = rs.getString("name_days");
+        setDay(d);
     }
 
     public LabWorker(String labWorkerId, String name, String email, String pass) {
         super(name, email, pass);
         this.labWorkerId = labWorkerId;
+    }
+    
+    private void setDay(String d) {
+        String[] sd = d.split(",");
+        for(String sd1 : sd) {
+            days.add(Day.valueOf(sd1));
+        }
     }
 
     public String getLabWorkerId() {
