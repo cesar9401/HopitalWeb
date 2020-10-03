@@ -1,8 +1,10 @@
 package com.hospital.model;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.servlet.http.HttpServletRequest;
 import org.jdom2.Element;
 
 /**
@@ -34,6 +36,14 @@ public class Person implements Serializable{
         this.phone = rs.getString("phone");
         this.email = rs.getString("email");
         this.pass = rs.getString("password");
+    }
+    
+    public Person(HttpServletRequest request) throws UnsupportedEncodingException {
+        this.name = new String(request.getParameter("name").getBytes("ISO-8859-1"), "UTF-8");
+        this.dpi = request.getParameter("dpi");
+        this.phone = request.getParameter("phone");
+        this.email = new String(request.getParameter("email").getBytes("ISO-8859-1"), "UTF-8");
+        this.pass = new String(request.getParameter("pass").getBytes("ISO-8859-1"), "UTF-8");
     }
 
     public Person(String name, String email, String pass) {

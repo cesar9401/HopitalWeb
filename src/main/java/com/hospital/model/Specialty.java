@@ -41,12 +41,12 @@ public class Specialty implements Serializable {
         this.priceConsultation = Double.parseDouble(request.getParameter("price"));
     }
 
-    public Specialty(String degree) {
-        this.degree = degree;
-    }
-
-    public Specialty(int specialtyId, String degree) {
+    public Specialty(int specialtyId, String doctorId) {
         this.specialtyId = specialtyId;
+        this.doctorId = doctorId;
+    }
+    
+    public Specialty(String degree) {
         this.degree = degree;
     }
 

@@ -17,17 +17,12 @@ window.onload = function () {
     });
 };
 
-setSpecialty = function (id, degree, price) {
-    $('#specialtyId').val(id);
-    $('#degree').val(degree);
-    $('#price').val(price);
-};
-
-setExam = function (id, name, order, desc, price, report) {
+//Eventos para editar examen
+var setExam = function (id, name, order, desc, price, report) {
     var btnSubmit = document.getElementById('btn-submit');
     btnSubmit.value = "editExam";
     btnSubmit.textContent = "Editar";
-    
+
     $('#examId').val(id);
     $('#name').val(name);
     $('#order').val(order);
@@ -36,10 +31,39 @@ setExam = function (id, name, order, desc, price, report) {
     $('#description').val(desc);
 };
 
-newExam = function () {
+//Eventos para ingresar nuevo examen
+var newExam = function () {
     var btnSubmit = document.getElementById('btn-submit');
     btnSubmit.value = "newExam";
     btnSubmit.textContent = "Agregar";
 
     $('#examId').val("0");
+    $('#name').val("");
+    $('#order').val("");
+    $('#report').val("");
+    $('#price').val("");
+    $('#description').val("");
 };
+
+//Eventos para editar especialidad
+var setSpecialty = function (id, degree, price) {
+    var btn = document.getElementById('btn-submit-specialty');
+    btn.value = "editSpecialty";
+    btn.textContent = "Editar";
+
+    $('#specialtyId').val(id);
+    $('#degree').val(degree);
+    $('#price').val(price);
+};
+
+//Eventos para agregar nueva especialidad
+var addSpecialty = function () {
+    var btn = document.getElementById('btn-submit-specialty');
+    btn.value = "newSpecialty";
+    btn.textContent = "Agregar";
+    
+    $('#specialtyId').val("0");
+    $('#degree').val("");
+    $('#price').val("");
+};
+

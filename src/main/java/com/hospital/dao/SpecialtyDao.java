@@ -160,7 +160,8 @@ public class SpecialtyDao {
 
     /**
      * Metodo para actualizar una especialidad en la base de datos
-     * @param s 
+     *
+     * @param s
      */
     public void updateSpecialty(Specialty s) {
         String query = "UPDATE SPECIALTIES SET degree = ?, price_consultation = ? WHERE specialty_id = ?";
@@ -168,6 +169,21 @@ public class SpecialtyDao {
             pst.setString(1, s.getDegree());
             pst.setDouble(2, s.getPriceConsultation());
             pst.setInt(3, s.getSpecialtyId());
+            pst.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+    }
+
+    /**
+     * Insertar a la base de datos las especialidades de cada medico
+     * @param s 
+     */
+    public void insertMedicalDegreeById(Specialty s) {
+        String query = "INSERT INTO MEDICAL_DEGREES(doctor_id, specialty_id) VALUES(?, ?)";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setString(1, s.getDoctorId());
+            pst.setInt(2, s.getSpecialtyId());
             pst.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);

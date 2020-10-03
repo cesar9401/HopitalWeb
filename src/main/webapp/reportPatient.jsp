@@ -33,7 +33,7 @@
                                 <ul class="list-group list-group-flush">
                                     <li class="list-group-item"><span class="font-weight-bold">Nombre: </span>${patient.name}</li>
                                     <li class="list-group-item"><span class="font-weight-bold">Nacimiento: </span>${patient.birth}</li>
-                                    <li class="list-group-item"><span class="font-weight-bold">Peso: </span>${patient.phone}</li>
+                                    <li class="list-group-item"><span class="font-weight-bold">Peso: </span>${patient.weight} Kg.</li>
                                     <li class="list-group-item"><span class="font-weight-bold">Sangre: </span><span class="badge badge-danger">${patient.blood}</span></li>
                                     <li class="list-group-item">
                                         <span class="font-weight-bold">G&eacute;nero: </span>

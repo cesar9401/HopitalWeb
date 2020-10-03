@@ -156,6 +156,7 @@
 
         <%@include file="js.html" %>
         <script type="text/javascript" src="js/script.js"></script>
+        
         <c:if test="${examUp != null}">
             <script type="text/javascript">
                 $(document).ready(function () {

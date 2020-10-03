@@ -4,7 +4,9 @@ import com.hospital.dao.*;
 import com.hospital.model.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -144,15 +146,17 @@ public class DoctorController extends HttpServlet {
      *
      * @param request
      * @param response
+     * @throws javax.servlet.ServletException
+     * @throws java.io.IOException
      */
-    private void setDoctorsAdmin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void setDoctorsAdmin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         List<Doctor> doctors = doctorDao.getDoctors();
-        for(Doctor d : doctors) {
+        for (Doctor d : doctors) {
             d.setSpecialties(specialtyDao.getSpecialtiesByDoctor(d.getDoctorId()));
         }
         List<Specialty> specialties = specialtyDao.getSpecialties(false);
-        
-        request.setAttribute("specialty", specialties);
+
+        request.getSession().setAttribute("specialty", specialties);
         request.setAttribute("doctors", doctors);
         request.getRequestDispatcher("doctors.jsp").forward(request, response);
     }
@@ -191,6 +195,10 @@ public class DoctorController extends HttpServlet {
             case "editSpecialty":
                 //Editar especialidades
                 editSpecialty(request, response);
+                break;
+            case "newSpecialty":
+                newSpecialty(request, response);
+                break;
             case "searchExams":
                 //Buscar examenes para editar
                 searchExams(request, response);
@@ -201,6 +209,9 @@ public class DoctorController extends HttpServlet {
                 break;
             case "newExam":
                 newExam(request, response);
+                break;
+            case "searchDoctors":
+                searchDoctors(request, response);
                 break;
         }
     }
@@ -260,6 +271,18 @@ public class DoctorController extends HttpServlet {
     }
 
     /**
+     * Metodo que recibe la informacion de una nueva especialidad que se va a ingresar
+     * @param request
+     * @param response 
+     */
+    private void newSpecialty(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, ServletException, IOException {
+        Specialty tmp = new Specialty(request);
+        specialtyDao.insertSpecialty(tmp);
+        request.setAttribute("newSpecialty", tmp.getDegree());
+        setSpecialtiesAdmin(request, response);
+    }
+
+    /**
      * Metodo para buscar examenes para poder editarlos
      *
      * @param request
@@ -292,11 +315,66 @@ public class DoctorController extends HttpServlet {
         setExamsAdmin(request, response);
     }
 
+    /**
+     * Metodo para crear un nuevo examen en el sistema
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     private void newExam(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Exam tmp = new Exam(request);
         examDao.createExam(tmp);
         request.setAttribute("newEx", tmp.getName());
         setExamsAdmin(request, response);
+    }
+
+    /**
+     * Metodo para buscar doctores y enviarlos al admnistradores para poder
+     * editar
+     *
+     * @param request
+     * @param response
+     * @throws UnsupportedEncodingException
+     * @throws ServletException
+     * @throws IOException
+     */
+    private void searchDoctors(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, ServletException, IOException {
+        int opt = Integer.parseInt(request.getParameter("kind"));
+        List<Doctor> doctors = new ArrayList<>();
+        switch (opt) {
+            case 1:
+                String name = new String(request.getParameter("name").getBytes("ISO-8859-1"), "UTF8");
+                System.out.println("name = " + name);
+                doctors = doctorDao.getDoctorsByName(name);
+                break;
+            case 2:
+                int specialtyId = Integer.parseInt(request.getParameter("specialty"));
+                System.out.println("specialtyId = " + specialtyId);
+                doctors = doctorDao.getDoctorsBySpeciality(specialtyId);
+                break;
+            case 3:
+                java.sql.Time time1 = ReadXml.getTime(request.getParameter("time1"));
+                System.out.println("time1 = " + time1);
+                java.sql.Time time2 = ReadXml.getTime(request.getParameter("time2"));
+                System.out.println("time2 = " + time2);
+                doctors = doctorDao.getDoctorsByHours(time1, time2);
+                break;
+            case 4:
+                java.sql.Date date1 = ReadXml.getDate(request.getParameter("date1"));
+                System.out.println("date = " + date1);
+                java.sql.Date date2 = ReadXml.getDate(request.getParameter("date2"));
+                System.out.println("date2 = " + date2);
+                doctors = doctorDao.getDoctorsByStartDate(date1, date2);
+                break;
+        }
+        for (Doctor d : doctors) {
+            d.setSpecialties(specialtyDao.getSpecialtiesByDoctor(d.getDoctorId()));
+        }
+
+        request.setAttribute("doctors", doctors);
+        request.getRequestDispatcher("doctors.jsp").forward(request, response);
     }
 
     /**

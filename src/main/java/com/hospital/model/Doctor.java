@@ -2,12 +2,14 @@ package com.hospital.model;
 
 import com.hospital.controller.ReadXml;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.jdom2.Element;
 
 /**
@@ -47,6 +49,15 @@ public class Doctor extends Person implements Serializable{
         this.startDate = rs.getDate("start_date");
         String s = rs.getString("specialties");
         setSpecialty(s);        
+    }
+    
+    public Doctor(HttpServletRequest request) throws UnsupportedEncodingException{
+        super(request);
+        this.doctorId = new String(request.getParameter("doctorId").getBytes("ISO-8859-1"), "UTF-8");
+        this.collegiate = request.getParameter("collegiate");
+        this.startTime = ReadXml.getTime(request.getParameter("startTime"));
+        this.endTime = ReadXml.getTime(request.getParameter("endTime"));
+        this.startDate = ReadXml.getDate(request.getParameter("date"));
     }
     
     private void setSpecialty(String s) {

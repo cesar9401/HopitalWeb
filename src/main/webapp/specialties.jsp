@@ -21,9 +21,10 @@
 
                 <div class="row my-4">
                     <div class="col">
+                        <!--Formulario aqui-->
                         <form action="DoctorController" method="post">
                             <div class="form-row my-0">
-                                <div class="col-12 col-md-4 my-2">
+                                <div class="col-12 col-md-3 my-2">
                                     <select id="inputType" class="form-control" name="kind" required>
                                         <option value="0" selected>Especialidad</option>
                                         <option value="1">Precio (Igual)</option>
@@ -36,6 +37,9 @@
                                 </div>
                                 <div class="col-12 col-md-2 my-2">
                                     <button type="submit" class="btn btn-info btn-block" name="action" value="searchSpecialties">Buscar</button>
+                                </div>
+                                <div class="col-12 col-md-1 my-2">
+                                    <a href="#" onclick="addSpecialty()" class="btn btn-outline-info" data-toggle="modal" data-target="#modalSpecialty">Agregar</a>
                                 </div>
                             </div>
                         </form>
@@ -87,7 +91,7 @@
                                 <label for="price">Precio Q.</label>
                                 <input type="number" step="any" min="0" class="form-control" id="price" name="price" placeholder="Precio Q." required>
                             </div>
-                            <button type="submit" class="btn btn-primary" name="action" value="editSpecialty">Editar</button>
+                            <button type="submit" id="btn-submit-specialty" class="btn btn-primary" name="action" value="editSpecialty">Editar</button>
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -108,7 +112,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <p>Se ha actualizado correctamente la Especialidad: ${update.degree}</p>
+                        <p id="modal-info-specialties">Se ha actualizado correctamente la Especialidad: ${update.degree}</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -119,12 +123,23 @@
 
         <%@include file="js.html" %>
         <script type="text/javascript" src="js/script.js"></script>
+
         <c:if test="${update != null}">
             <script type="text/javascript">
                 $(document).ready(function () {
                     $('#modalInfo').modal('show');
                 });
             </script>        
+        </c:if>
+
+        <c:if test="${newSpecialty != null}">
+            <script type="text/javascript">
+                var p = document.getElementById("modal-info-specialties");
+                p.textContent = "Se ha agregado correctamente la nueva especializacion ${newSpecialty}";
+                $(document).ready(function () {
+                    $('#modalInfo').modal('show');
+                });
+            </script>
         </c:if>
     </body>
 </html>
