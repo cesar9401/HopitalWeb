@@ -353,16 +353,19 @@ public class MainController extends HttpServlet {
         request.getSession().setAttribute("appDoc", appointments);
         request.getRequestDispatcher("doctorView.jsp").forward(request, response);
     }
-    
+
     /**
      * Metodo para dirigir al perfil del laboratorista
+     *
      * @param request
      * @param response
-     * @param labWorker 
+     * @param labWorker
      */
     private void setProfileLabWorker(HttpServletRequest request, HttpServletResponse response, LabWorker labWorker) throws ServletException, IOException {
+        Exam exam = examDao.getExamById(labWorker.getExamId());
         request.getSession().setAttribute("user", labWorker.getLabWorkerId());
         request.getSession().setAttribute("profile", labWorker);
+        request.setAttribute("exam", exam);
         request.getRequestDispatcher("labWorkerView.jsp").forward(request, response);
     }
 

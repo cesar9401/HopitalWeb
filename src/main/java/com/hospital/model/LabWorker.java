@@ -20,6 +20,7 @@ public class LabWorker extends Person {
     private int examId;
     private String examName;
     private List<Day> days = new ArrayList<>();
+    private Exam exam;
 
     public LabWorker(Element e) {
         super(e);
@@ -104,6 +105,14 @@ public class LabWorker extends Person {
         this.days = days;
     }
 
+    public Exam getExam() {
+        return exam;
+    }
+
+    public void setExam(Exam exam) {
+        this.exam = exam;
+    }
+    
     @Override
     public String toString() {
         return super.toString() + "LabWorker{" + "labWorkerId=" + labWorkerId + ", registry=" + registry + ", startDate=" + startDate + ", examId=" + examId + '}';

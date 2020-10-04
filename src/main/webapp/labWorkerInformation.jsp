@@ -18,15 +18,15 @@
                 <div class="container my-4">
                     <div class="row">
                         <div class="col text-center">
-                            <h1 class="text-info" id="title">Nuevo Doctor</h1>
+                            <h1 class="text-info" id="title">Nuevo Laboratorista</h1>
                         </div>
                     </div>
 
-                    <form action="AdminController" method="post">
+                    <form action="LabController" method="post">
                         <div class="form-row">
                             <div class="form-group col-md-3">
-                                <label for="id">Id</label>
-                                <input type="text" class="form-control" id="doctorId" name="doctorId" required>
+                                <label for="labWorkerId">Id</label>
+                                <input type="text" class="form-control" id="labWorkerId" name="labWorkerId" required>
                             </div>
                             <div class="form-group col-md-5">
                                 <label for="name">Nombre</label>
@@ -43,31 +43,33 @@
                                 <input type="number" class="form-control" id="dpi" name="dpi" required>
                             </div>
                             <div class="form-group col-md-6">
-                                <label for="collegiate">Colegiado</label>
-                                <input type="number" class="form-control" id="collegiate" name="collegiate" required>
+                                <label for="registryNumber">Registro de Salud</label>
+                                <input type="text" class="form-control" id="registryNumber" name="registryNumber" required>
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group col-md">
-                            <c:forEach var="s" items="${specialties}">
-                                <input type="checkbox" name="docSpecialties" id="${s.specialtyId}" value="${s.specialtyId}">
-                                <label>${s.degree}</label>
+                            <div class="form-group col-md-6">
+                                <label for="days">Dias de Trabajo</label><hr>
+                            <c:forEach var="d" items="${days}">
+                                <input type="checkbox" name="days" id="${d.dayId}" value="${d.dayId}">
+                                <label>${d.day}</label>
                                 <br/>
                             </c:forEach>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exams">Examenes</label>
+                            <select id="exams" class="form-control" name="exams">
+                                <option value="" selected>Choose...</option>
+                                <c:forEach var="e" items="${exams}">
+                                    <option value="${e.examId}">${e.name}</option>
+                                </c:forEach>
+                            </select>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-4">
                             <label for="date">Fecha</label>
                             <input type="date" id="date" name="date" class="form-control" required>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="startTime">Hora de Ingreso</label>
-                            <input type="time" id="startTime" name="startTime" class="form-control" required>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="startTime">Hora de Salida</label>
-                            <input type="time" id="endTime" name="endTime" class="form-control" required>
                         </div>
                     </div>
                     <div class="form-row">
@@ -82,7 +84,7 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-2 offset-md-5">
-                            <button type="submit" name="action" value="addDoctor" id="btn-submit" class="btn btn-primary btn-block">Agregar</button>
+                            <button type="submit" name="action" value="addLabWorker" id="btn-submit" class="btn btn-primary btn-block">Agregar</button>
                         </div>
                     </div>
                 </form>
@@ -90,29 +92,28 @@
         </section>
 
         <%@include file="js.html" %>
-        <c:if test="${doctor != null}">
+        <c:if test="${labWorker != null}">
             <script type="text/javascript">
                 var btn = document.getElementById('btn-submit');
-                btn.value = "editDoctor";
+                btn.value = "editLabWorker";
                 btn.textContent = "Editar";
 
                 window.onload = function () {
-                    $('.text-info').text('Editar Doctor');
-                    $('#doctorId').prop('readonly', true);
+                    $('text-info').text('Editar Laboratorista');
+                    $('#labWorkerId').prop('readonly', true);
 
-                    $('#doctorId').val("${doctor.doctorId}");
-                    $('#name').val("${doctor.name}");
-                    $('#phone').val("${doctor.phone}");
-                    $('#dpi').val("${doctor.dpi}");
-                    $('#collegiate').val("${doctor.collegiate}");
-                    $('#date').val("${doctor.startDate}");
-                    $('#startTime').val("${doctor.startTime}");
-                    $('#endTime').val("${doctor.endTime}");
-                    $('#email').val("${doctor.email}");
-                    $('#pass').val("${doctor.pass}");
+                    $('#labWorkerId').val("${labWorker.labWorkerId}");
+                    $('#name').val("${labWorker.name}");
+                    $('#phone').val("${labWorker.phone}");
+                    $('#dpi').val("${labWorker.dpi}");
+                    $('#registryNumber').val("${labWorker.registry}");
+                    $('#date').val("${labWorker.startDate}");
+                    $('#email').val("${labWorker.email}");
+                    $('#pass').val("${labWorker.pass}");
 
-                <c:forEach var="s" items="${doctor.specialties}">
-                    $('#${s.specialtyId}').attr('checked', true);
+                    $('#exams').val("${labWorker.examId}");
+                <c:forEach var="d" items="${labWorker.days}">
+                    $('#${d.dayId}').prop('checked', true);
                 </c:forEach>
                 };
             </script>

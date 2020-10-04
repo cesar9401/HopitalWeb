@@ -40,7 +40,7 @@
                                         <select id="specialty" class="form-control" name="specialty">
                                             <option value="" selected>Choose...</option>
                                         <c:forEach var="s" items="${specialty}">
-                                            <option value="${s.specialtyId}" selected>${s.degree}</option>
+                                            <option value="${s.specialtyId}">${s.degree}</option>
                                         </c:forEach>
                                     </select>
                                 </div>

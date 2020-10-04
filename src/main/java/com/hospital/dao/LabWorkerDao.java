@@ -135,4 +135,69 @@ public class LabWorkerDao {
         }
         return labs;
     }
+
+    /**
+     * Obtener laboratoristas segun nombre
+     *
+     * @param name
+     * @return
+     */
+    public List<LabWorker> getLabWorkersByName(String name) {
+        String str = "%" + name + "%";
+        List<LabWorker> labs = new ArrayList<>();
+        String query = "SELECT l.*, GROUP_CONCAT(d.name_day) AS name_days FROM LAB_WORKERS l INNER JOIN WORKER_DAYS w ON l.lab_worker_id = w.lab_worker_id INNER JOIN DAYS d ON w.day_id = d.day_id "
+                + "WHERE l.name LIKE ? GROUP BY l.lab_worker_id";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setString(1, str);
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    labs.add(new LabWorker(rs));
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        return labs;
+    }
+
+    /**
+     * Obtener laboratoristas segun codigo de examen
+     *
+     * @param examId
+     * @return
+     */
+    public List<LabWorker> getLabWorkersByExam(int examId) {
+        List<LabWorker> labs = new ArrayList<>();
+        String query = "SELECT l.*, GROUP_CONCAT(d.name_day) AS name_days FROM LAB_WORKERS l INNER JOIN WORKER_DAYS w ON l.lab_worker_id = w.lab_worker_id INNER JOIN DAYS d ON w.day_id = d.day_id "
+                + "WHERE l.exam_id = ? GROUP BY l.lab_worker_id";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setInt(1, examId);
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    labs.add(new LabWorker(rs));
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        return labs;
+    }
+
+    public List<LabWorker> getLabWorkersByDays(int dayId) {
+        String str = "%" + dayId + "%";
+        List<LabWorker> labs = new ArrayList<>();
+        String query = "SELECT l.*, GROUP_CONCAT(d.name_day) AS name_days, GROUP_CONCAT(d.day_id) AS days_id FROM LAB_WORKERS l INNER JOIN WORKER_DAYS w ON l.lab_worker_id = w.lab_worker_id INNER JOIN DAYS d ON w.day_id = d.day_id "
+                + "GROUP BY l.lab_worker_id HAVING days_id LIKE ?";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setString(1, str);
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    labs.add(new LabWorker(rs));
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        return labs;
+    }
 }

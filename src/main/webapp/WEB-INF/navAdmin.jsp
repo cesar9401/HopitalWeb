@@ -13,6 +13,9 @@
                     <a class="nav-link" href="DoctorController?action=exams">Examenes</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="DoctorController?action=labWorkers">Laboratoristas</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="DoctorController?action=doctors">Doctores</a>
                 </li>
                 <li class="nav-item dropdown">

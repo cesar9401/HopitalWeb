@@ -29,6 +29,7 @@ public class DoctorController extends HttpServlet {
     private final ReportDao reportDao = new ReportDao(conexion);
     private final SpecialtyDao specialtyDao = new SpecialtyDao(conexion);
     private final ExamDao examDao = new ExamDao(conexion);
+    private final LabWorkerDao labDao = new LabWorkerDao(conexion);
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -86,7 +87,12 @@ public class DoctorController extends HttpServlet {
                 setExamsAdmin(request, response);
                 break;
             case "doctors":
+                //Doctores para el admin para edicion y creacion
                 setDoctorsAdmin(request, response);
+                break;
+            case "labWorkers":
+                //Laboratoristas para el admin para edicion y creacion
+                setLabWorkersAdmin(request, response);
                 break;
             //Redirige hacia jsp para escribir informe del paciente
             default:
@@ -159,6 +165,25 @@ public class DoctorController extends HttpServlet {
         request.getSession().setAttribute("specialty", specialties);
         request.setAttribute("doctors", doctors);
         request.getRequestDispatcher("doctors.jsp").forward(request, response);
+    }
+
+    /**
+     * Metodo para llevar informacion de los laboratoristas a la vista del
+     * aministrador
+     *
+     * @param request
+     * @param response
+     */
+    public void setLabWorkersAdmin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        List<LabWorker> labWorkers = labDao.getLabWorkers();
+        for (LabWorker l : labWorkers) {
+            l.setExam(examDao.getExamById(l.getExamId()));
+        }
+        List<Exam> exams = examDao.getExams(false);
+        request.setAttribute("days", Day.values());
+        request.setAttribute("exams", exams);
+        request.setAttribute("labWorkers", labWorkers);
+        request.getRequestDispatcher("labWorkers.jsp").forward(request, response);
     }
 
     /**
@@ -271,9 +296,11 @@ public class DoctorController extends HttpServlet {
     }
 
     /**
-     * Metodo que recibe la informacion de una nueva especialidad que se va a ingresar
+     * Metodo que recibe la informacion de una nueva especialidad que se va a
+     * ingresar
+     *
      * @param request
-     * @param response 
+     * @param response
      */
     private void newSpecialty(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, ServletException, IOException {
         Specialty tmp = new Specialty(request);

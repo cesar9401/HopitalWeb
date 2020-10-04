@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -125,6 +127,13 @@ public class ExamDao {
         return exams;
     }
 
+    /**
+     * Obtenter examenes segun rango de precio
+     *
+     * @param option
+     * @param price
+     * @return
+     */
     public List<Exam> getExamsByPrice(int option, Double price) {
         List<Exam> exams = new ArrayList<>();
         String query = "SELECT * FROM EXAMS WHERE price";
@@ -152,4 +161,25 @@ public class ExamDao {
         return exams;
     }
 
+    /**
+     * Obtener un examen segun su id
+     *
+     * @param examId
+     * @return
+     */
+    public Exam getExamById(int examId) {
+        Exam exam = null;
+        String query = "SELECT * FROM EXAMS WHERE exam_id = ?";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setInt(1, examId);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    exam = new Exam(rs);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        return exam;
+    }
 }
