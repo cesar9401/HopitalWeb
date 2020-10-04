@@ -22,7 +22,7 @@
                         </div>
                     </div>
 
-                    <form action="AdminController" method="post">
+                    <form action="AdminController" method="post" onsubmit="return validar(this)">
                         <div class="form-row">
                             <div class="form-group col-md-3">
                                 <label for="id">Id</label>
@@ -90,6 +90,24 @@
         </section>
 
         <%@include file="js.html" %>
+        <script type="text/javascript">
+            function validar(formulario) {
+                var check = formulario.docSpecialties;
+                var uno = false;
+                for (let i = 0; i < check.length; i++) {
+                    if (check[i].checked) {
+                        uno = true;
+                    }
+                }
+
+                if (!uno) {
+                    alert("Debe seleccionar al menos una especialidad");
+                    return false;
+                }
+                
+                return true;
+            }
+        </script>
         <c:if test="${doctor != null}">
             <script type="text/javascript">
                 var btn = document.getElementById('btn-submit');
@@ -112,7 +130,7 @@
                     $('#pass').val("${doctor.pass}");
 
                 <c:forEach var="s" items="${doctor.specialties}">
-                    $('#${s.specialtyId}').attr('checked', true);
+                    $('#${s.specialtyId}').prop('checked', true);
                 </c:forEach>
                 };
             </script>

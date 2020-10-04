@@ -1,11 +1,13 @@
 package com.hospital.model;
 
 import com.hospital.controller.ReadXml;
+import java.io.UnsupportedEncodingException;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.jdom2.Element;
 
 /**
@@ -43,6 +45,18 @@ public class LabWorker extends Person {
         this.examId = rs.getInt("exam_id");
         String d = rs.getString("name_days");
         setDay(d);
+    }
+    
+    public LabWorker(HttpServletRequest request) throws UnsupportedEncodingException {
+        super(request);
+        this.labWorkerId = new String(request.getParameter("labWorkerId").getBytes("ISO-8859-1"), "UTF-8");
+        this.registry = new String(request.getParameter("registryNumber").getBytes("ISO-8859-1"), "UTF-8");
+        this.examId = Integer.parseInt(request.getParameter("exams"));
+        this.startDate = ReadXml.getDate(request.getParameter("date"));
+        String[] d = request.getParameterValues("days");
+        for(String day : d) {
+            days.add(Day.valueOf(day));
+        }
     }
 
     public LabWorker(String labWorkerId, String name, String email, String pass) {

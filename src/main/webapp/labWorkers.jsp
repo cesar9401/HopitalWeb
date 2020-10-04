@@ -98,7 +98,27 @@
                 </div>
             </div>
         </section>
-        
+
+        <!--Modal para informar sobre actualizacion de datos o creacion de nuevos doctores doctor-->
+        <div class="modal fade" id="modal-info" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Información</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="modal-info-lab">Se ha actualizado correctamente al laboratorista ${updateLab}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <%@include file="js.html" %>
         <script type="text/javascript">
             window.onload = function () {
@@ -123,5 +143,23 @@
                 });
             };
         </script>
+        
+        <c:if test="${updateLab != null}">
+            <script>
+                $(document).ready(function () {
+                    $('#modal-info').modal('show');
+                });
+            </script>
+        </c:if>
+            
+        <c:if test="${newLab != null}">
+            <script>
+                var p = document.getElementById('modal-info-lab');
+                p.textContent = "Se ha ingresado correctamente al laboratorista ${newLab}";
+                $(document).ready(function () {
+                    $('#modal-info').modal('show');
+                });
+            </script>
+        </c:if>
     </body>
 </html>

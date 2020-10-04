@@ -52,8 +52,8 @@ public class DoctorDao {
 
     public void updateDoctor(Doctor doc, List<Specialty> ins, List<Specialty> del) {
         String query = "UPDATE DOCTORS SET name = ?, collegiate = ?, dpi = ?, phone = ?, email = ?, start_time = ?, end_time = ?, start_date = ?, password = ? WHERE doctor_id = ?";
-        String queryIns = "INSERT INTO MEDICAL_DEGREES(doctor_id, specialty_id) VALUES(?, ?)";
         String queryDel = "DELETE FROM MEDICAL_DEGREES WHERE doctor_id = ? AND specialty_id = ?";
+        String queryIns = "INSERT INTO MEDICAL_DEGREES(doctor_id, specialty_id) VALUES(?, ?)";
         PreparedStatement pst = null;
         try {
             this.transaction.setAutoCommit(false);
@@ -70,15 +70,15 @@ public class DoctorDao {
             pst.setString(10, doc.getDoctorId());
             pst.executeUpdate();
 
-            pst = this.transaction.prepareStatement(queryIns);
-            for (Specialty s : ins) {
+            pst = this.transaction.prepareStatement(queryDel);
+            for (Specialty s : del) {
                 pst.setString(1, doc.getDoctorId());
                 pst.setInt(2, s.getSpecialtyId());
                 pst.executeUpdate();
             }
-            
-            pst = this.transaction.prepareStatement(queryDel);
-            for (Specialty s : del) {
+
+            pst = this.transaction.prepareStatement(queryIns);
+            for (Specialty s : ins) {
                 pst.setString(1, doc.getDoctorId());
                 pst.setInt(2, s.getSpecialtyId());
                 pst.executeUpdate();

@@ -149,14 +149,6 @@ public class AdminController extends HttpServlet {
                 }
             }
 
-            /**
-             * System.out.println("Ingresar"); for (Specialty s : specialtiesN)
-             * { System.out.println(s.toString()); }
-             *
-             * System.out.println("Eliminar"); for (Specialty s : specialtiesDB)
-             * { System.out.println(s.toString()); }
-             *
-             */
             doctorDao.updateDoctor(doctor, specialtiesN, specialtiesDB);
             request.setAttribute("updateDoctor", doctor.getName());
             doc.setDoctorsAdmin(request, response);

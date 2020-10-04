@@ -22,7 +22,7 @@
                         </div>
                     </div>
 
-                    <form action="LabController" method="post">
+                    <form action="LabController" method="post" onsubmit="return validar(this)">
                         <div class="form-row">
                             <div class="form-group col-md-3">
                                 <label for="labWorkerId">Id</label>
@@ -51,14 +51,14 @@
                             <div class="form-group col-md-6">
                                 <label for="days">Dias de Trabajo</label><hr>
                             <c:forEach var="d" items="${days}">
-                                <input type="checkbox" name="days" id="${d.dayId}" value="${d.dayId}">
+                                <input type="checkbox" name="days" id="${d.day}" value="${d.day}">
                                 <label>${d.day}</label>
                                 <br/>
                             </c:forEach>
                         </div>
                         <div class="form-group col-md-6">
                             <label for="exams">Examenes</label>
-                            <select id="exams" class="form-control" name="exams">
+                            <select id="exams" class="form-control" name="exams" required>
                                 <option value="" selected>Choose...</option>
                                 <c:forEach var="e" items="${exams}">
                                     <option value="${e.examId}">${e.name}</option>
@@ -92,14 +92,32 @@
         </section>
 
         <%@include file="js.html" %>
+        <script type="text/javascript">
+            function validar(formulario) {
+                var uno = false;
+                var check = formulario.days;
+                for (let i = 0; i < check.length; i++) {
+                    if (check[i].checked) {
+                        uno = true;
+                    }
+                }
+
+                if (!uno) {
+                    alert("Debe seleccionar al menos un día de trabajo");
+                    return false;
+                }
+
+                return true;
+            }
+        </script>
         <c:if test="${labWorker != null}">
             <script type="text/javascript">
                 var btn = document.getElementById('btn-submit');
                 btn.value = "editLabWorker";
                 btn.textContent = "Editar";
-
+                
                 window.onload = function () {
-                    $('text-info').text('Editar Laboratorista');
+                    $('.text-info').text('Editar Laboratorista');
                     $('#labWorkerId').prop('readonly', true);
 
                     $('#labWorkerId').val("${labWorker.labWorkerId}");
@@ -113,7 +131,7 @@
 
                     $('#exams').val("${labWorker.examId}");
                 <c:forEach var="d" items="${labWorker.days}">
-                    $('#${d.dayId}').prop('checked', true);
+                    $('#${d.day}').prop('checked', true);
                 </c:forEach>
                 };
             </script>

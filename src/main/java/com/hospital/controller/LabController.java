@@ -4,6 +4,7 @@ import com.hospital.dao.*;
 import com.hospital.model.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ public class LabController extends HttpServlet {
     private final Connection conexion = main.getConexion();
     private final LabWorkerDao labDao = new LabWorkerDao(conexion);
     private final ExamDao examDao = new ExamDao(conexion);
-    
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -79,7 +80,7 @@ public class LabController extends HttpServlet {
                 break;
         }
     }
-    
+
     private void newLabWorker(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         List<Exam> exams = examDao.getExams(false);
         request.setAttribute("exams", exams);
@@ -106,14 +107,14 @@ public class LabController extends HttpServlet {
                 break;
             case "addLabWorker":
                 //Agregar nuevo laboratorista
-                System.out.println("Agregar LabWorker");
+                addLabWorker(request, response);
                 break;
             case "editLabWorker":
                 //Editar laboratorista
-                System.out.println("Editar");
+                editLabWorker(request, response);
                 break;
         }
-        
+
     }
 
     /**
@@ -151,6 +152,58 @@ public class LabController extends HttpServlet {
         request.setAttribute("exams", exams);
         request.setAttribute("labWorkers", labWorkers);
         request.getRequestDispatcher("labWorkers.jsp").forward(request, response);
+    }
+
+    /**
+     * Metodo para agregar un laboratorista nuevo al sistema y agregarlo a la bd
+     *
+     * @param request
+     * @param response
+     */
+    private void addLabWorker(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, ServletException, IOException {
+        LabWorker labWorker = new LabWorker(request);
+        labDao.createLabWoker(labWorker);
+        labDao.insertLabWorkersDays(labWorker);
+        request.setAttribute("newLab", labWorker.getName());
+        doctorController.setLabWorkersAdmin(request, response);
+    }
+
+    /**
+     * Metdo para la edicio de un laboratorista y agregarlo la la bd
+     *
+     * @param request
+     * @param response
+     */
+    private void editLabWorker(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, ServletException, IOException {
+        LabWorker labEdit = new LabWorker(request);
+        LabWorker labDB = labDao.getLabWorkerById(labEdit.getLabWorkerId());
+        List<Day> dayN = labEdit.getDays();
+        List<Day> dayDB = labDB.getDays();
+
+        for (int i = 0; i < dayN.size(); i++) {
+            for (int j = 0; j < dayDB.size(); j++) {
+                if (dayN.get(i).getDayId() == dayDB.get(j).getDayId()) {
+                    dayN.remove(i);
+                    dayDB.remove(j);
+                    i--;
+                    break;
+                }
+            }
+        }
+
+        System.out.println("Nuevos");
+        for (Day d : dayN) {
+            System.out.println(d.getDayId() + " " + d.getDay());
+        }
+
+        System.out.println("Eliminar");
+        for (Day d : dayDB) {
+            System.out.println(d.getDayId() + " " + d.getDay());
+        }
+
+        labDao.updateLabWorker(labEdit, dayN, dayDB);
+        request.setAttribute("updateLab", labEdit.getName());
+        doctorController.setLabWorkersAdmin(request, response);
     }
 
     /**

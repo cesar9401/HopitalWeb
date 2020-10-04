@@ -1,5 +1,6 @@
 package com.hospital.dao;
 
+import com.hospital.conexion.Conexion;
 import com.hospital.model.Day;
 import com.hospital.model.LabWorker;
 import java.sql.Connection;
@@ -43,6 +44,30 @@ public class LabWorkerDao {
             pst.setDate(7, lab.getStartDate());
             pst.setString(8, lab.getPass());
             pst.setString(9, lab.getExamName());
+            pst.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+    }
+
+    /**
+     * Metodo un nuevo laboratorista a la base de datos, teniendo el id del
+     * examen que realizará
+     *
+     * @param lab
+     */
+    public void createLabWoker(LabWorker lab) {
+        String query = "INSERT INTO LAB_WORKERS(lab_worker_id, name, registry_number, dpi, phone, email, start_date, password, exam_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setString(1, lab.getLabWorkerId());
+            pst.setString(2, lab.getName());
+            pst.setString(3, lab.getRegistry());
+            pst.setString(4, lab.getDpi());
+            pst.setString(5, lab.getPhone());
+            pst.setString(6, lab.getEmail());
+            pst.setDate(7, lab.getStartDate());
+            pst.setString(8, lab.getPass());
+            pst.setInt(9, lab.getExamId());
             pst.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
@@ -199,5 +224,58 @@ public class LabWorkerDao {
             ex.printStackTrace(System.out);
         }
         return labs;
+    }
+
+    /**
+     * Metodo para actualizar datos de laboratorista y dias de trabajo
+     *
+     * @param lab
+     * @param newD
+     * @param delD
+     */
+    public void updateLabWorker(LabWorker lab, List<Day> newD, List<Day> delD) {
+        String query = "UPDATE LAB_WORKERS SET name = ?, registry_number = ?, dpi = ?, phone = ?, email = ?, start_date = ?, password = ?, exam_id = ? WHERE lab_worker_id = ?";
+        String queryDel = "DELETE FROM WORKER_DAYS WHERE lab_worker_id = ? AND day_id = ?";
+        String queryNew = "INSERT INTO WORKER_DAYS(lab_worker_id, day_id) VALUES(?, ?)";
+
+        PreparedStatement pst = null;
+        try {
+            this.transaction.setAutoCommit(false);
+            pst = this.transaction.prepareStatement(query);
+            pst.setString(1, lab.getName());
+            pst.setString(2, lab.getRegistry());
+            pst.setString(3, lab.getDpi());
+            pst.setString(4, lab.getPhone());
+            pst.setString(5, lab.getEmail());
+            pst.setDate(6, lab.getStartDate());
+            pst.setString(7, lab.getPass());
+            pst.setInt(8, lab.getExamId());
+            pst.setString(9, lab.getLabWorkerId());
+            pst.executeUpdate();
+
+            pst = this.transaction.prepareStatement(queryDel);
+            for (Day del : delD) {
+                pst.setString(1, lab.getLabWorkerId());
+                pst.setInt(2, del.getDayId());
+                pst.executeUpdate();
+            }
+            
+            pst = this.transaction.prepareStatement(queryNew);
+            for(Day n : newD) {
+                pst.setString(1, lab.getLabWorkerId());
+                pst.setInt(2, n.getDayId());
+                pst.executeUpdate();
+            }
+            this.transaction.commit();
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+            try {
+                this.transaction.rollback();
+            } catch (SQLException ex1) {
+                ex1.printStackTrace(System.out);
+            }
+        } finally {
+            Conexion.close(pst);
+        }
     }
 }
