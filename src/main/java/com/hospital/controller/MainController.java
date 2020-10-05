@@ -88,7 +88,6 @@ public class MainController extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.invalidate();
                 request.getRequestDispatcher("index.jsp").forward(request, response);
-                //response.sendRedirect("index.jsp");
                 break;
             case "newAppointment":
                 //Nueva cita

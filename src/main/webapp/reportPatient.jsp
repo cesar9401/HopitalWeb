@@ -81,6 +81,7 @@
                                             <input type="hidden" name="appointmentId" value="${appointment.appointmentId}">
                                             <input type="hidden" name="patientId" value="${appointment.patientId}">
                                             <input type="hidden" name="doctorId" value="${appointment.doctorId}">
+                                            <input type="hidden" name="specialtyId" value="${appointment.specialtyId}">
                                             <button type="submit" name="action" value="newReport" class="btn btn-outline-success btn-block">Guardar</button>
                                         </div>
                                     </div>

@@ -53,7 +53,9 @@ public class ReportDao {
      */
     public List<Report> getReportsByPatient(int patientId) {
         List<Report> reports = new ArrayList<>();
-        String query = "SELECT * FROM REPORTS WHERE patient_id = ? ORDER BY date";
+        //String query = "SELECT * FROM REPORTS WHERE patient_id = ? ORDER BY date";
+        String query = "SELECT r.*, p.name AS patient, d.name AS doctor FROM REPORTS r INNER JOIN PATIENTS p ON r.patient_id = p.patient_id INNER JOIN DOCTORS d ON r.doctor_id = d.doctor_id "
+                + "WHERE r.patient_id = ? ORDER BY date, time";
         try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setInt(1, patientId);
             try (ResultSet rs = pst.executeQuery()) {
@@ -73,19 +75,31 @@ public class ReportDao {
      * @param r
      */
     public void createReport(Report r) {
+        int id = 0;
         String query = "INSERT INTO REPORTS(appointment_id, patient_id, doctor_id, report, date, time) VALUES(?, ?, ?, ?, ?, ?)";
+        String queryIncome = "INSERT INTO INCOMES(report_id, income) VALUES(?, (SELECT price_consultation FROM SPECIALTIES WHERE specialty_id = ? LIMIT 1))";
         String queryUpdate = "UPDATE APPOINTMENTS SET status = ? WHERE appointment_id = ?";
         PreparedStatement pst = null;
-        try 
-        {
+        ResultSet rs = null;
+        try {
             this.transaction.setAutoCommit(false);
-            pst = this.transaction.prepareStatement(query);
+            pst = this.transaction.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
             pst.setInt(1, r.getAppointmentId());
             pst.setInt(2, r.getPatientId());
             pst.setString(3, r.getDoctorId());
             pst.setString(4, r.getReport());
             pst.setDate(5, r.getDate());
             pst.setTime(6, r.getTime());
+            pst.executeUpdate();
+
+            rs = pst.getGeneratedKeys();
+            if (rs.next()) {
+                id = rs.getInt(1);
+            }
+
+            pst = this.transaction.prepareStatement(queryIncome);
+            pst.setInt(1, id);
+            pst.setInt(2, r.getSpecialtyId());
             pst.executeUpdate();
             
             pst = this.transaction.prepareStatement(queryUpdate);
@@ -101,6 +115,7 @@ public class ReportDao {
                 ex1.printStackTrace(System.out);
             }
         } finally {
+            Conexion.close(rs);
             Conexion.close(pst);
         }
     }

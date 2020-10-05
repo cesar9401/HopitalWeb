@@ -211,7 +211,7 @@ public class DoctorController extends HttpServlet {
                 break;
             case "newReport":
                 //Crear informe para un paciente
-                createReport(request, response);
+                newReport(request, response);
                 break;
             case "searchSpecialties":
                 //Buscar especialidades para editar
@@ -250,9 +250,10 @@ public class DoctorController extends HttpServlet {
      * @throws ServletException
      * @throws IOException
      */
-    private void createReport(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void newReport(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Report report = new Report(request);
         System.out.println(report.toString());
+        System.out.println("Espcialidad: " + report.getSpecialtyId());
         reportDao.createReport(report);
         request.getSession().setAttribute("success", true);
         Doctor doctor = doctorDao.getDoctor(report.getDoctorId());

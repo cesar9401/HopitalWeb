@@ -24,6 +24,8 @@ public class Doctor extends Person implements Serializable{
     private Time endTime;
     private Date startDate;
     private List<Specialty> specialties = new ArrayList<>();
+    
+    private int quantity;
 
     public Doctor(Element e) {
         super(e);
@@ -67,9 +69,12 @@ public class Doctor extends Person implements Serializable{
         }
     }
 
-    public Doctor(String doctorId, String name, String email, String pass) {
-        super(name, email, pass);
+    public Doctor(String doctorId, String collegiate, Time startTime, Time endTime, int quantity) {
         this.doctorId = doctorId;
+        this.collegiate = collegiate;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.quantity = quantity;
     }
 
     public String getDoctorId() {
@@ -120,6 +125,14 @@ public class Doctor extends Person implements Serializable{
         this.specialties = specialties;
     }
 
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+    
     @Override
     public String toString() {
         return super.toString() + "Doctor{" + "doctorId=" + doctorId + ", collegiate=" + collegiate + ", startTime=" + startTime + ", endTime=" + endTime + ", startDate=" + startDate + '}';

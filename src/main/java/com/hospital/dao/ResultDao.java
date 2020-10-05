@@ -47,12 +47,20 @@ public class ResultDao {
         }
     }
 
+    /**
+     * Resultados de laboratorio de cada paciente
+     *
+     * @param patient_id
+     * @return
+     */
     public List<Result> getResultsByPatient(int patient_id) {
         List<Result> results = new ArrayList<>();
-        String query = "SELECT * FROM RESULTS WHERE patient_id = ? ORDER BY date";
-        try ( PreparedStatement pst = this.transaction.prepareStatement(query)) {
+        //String query = "SELECT * FROM RESULTS WHERE patient_id = ? ORDER BY date";
+        String query = "SELECT r.*, p.name AS patient, l.name AS labWorker, e.name AS exam FROM RESULTS r INNER JOIN PATIENTS p ON r.patient_id = p.patient_id INNER JOIN LAB_WORKERS l ON r.lab_worker_id = l.lab_worker_id INNER JOIN EXAMS e ON r.exam_id = e.exam_id "
+                + "WHERE r.patient_id = ? ORDER BY date";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setInt(1, patient_id);
-            try ( ResultSet rs = pst.executeQuery()) {
+            try (ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
                     results.add(new Result(rs));
                 }

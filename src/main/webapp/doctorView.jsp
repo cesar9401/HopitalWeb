@@ -78,7 +78,7 @@
                                         <c:set var="status" value="disabled"></c:set>
                                     </c:if>
                                     <tr>
-                                        <th scope="row">${a.patientId}</th>
+                                        <th scope="row">${a.appointmentId}</th>
                                         <td>${a.patientName}</td>
                                         <td><span class="badge badge-success">${a.degree}</span></td>
                                         <td>${a.time}</td>

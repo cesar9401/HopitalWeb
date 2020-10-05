@@ -17,6 +17,8 @@ public class Patient extends Person {
     private Date birth;
     private Double weight;
     private String blood;
+    
+    private Double total;
 
     public Patient(Element e) {
         super(e);
@@ -35,12 +37,15 @@ public class Patient extends Person {
         this.weight = rs.getDouble("weight");
         this.blood = rs.getString("blood");
     }
-    
-    public Patient(int patientId, String name, String email, String pass) {
-        super(name, email, pass);
-        this.patientId = patientId;
-    }
 
+    public Patient(int patientId, boolean gender, Double weight, String blood, Double total) {
+        this.patientId = patientId;
+        this.gender = gender;
+        this.weight = weight;
+        this.blood = blood;
+        this.total = total;
+    }
+    
     public int getPatientId() {
         return patientId;
     }
@@ -79,6 +84,14 @@ public class Patient extends Person {
 
     public void setBlood(String blood) {
         this.blood = blood;
+    }
+
+    public Double getTotal() {
+        return total;
+    }
+
+    public void setTotal(Double total) {
+        this.total = total;
     }
 
     @Override

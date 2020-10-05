@@ -28,6 +28,10 @@ public class Result implements Serializable{
     private int examId;
     private InputStream orderResult;
     private InputStream reportResult;
+    
+    private String patientName;
+    private String labWorkerName;
+    private String examName;
 
     public Result(Element e) {
         //super(e);
@@ -67,6 +71,10 @@ public class Result implements Serializable{
         this.reportResult = (InputStream) rs.getBlob("report");
         this.date = rs.getDate("date");
         this.time = rs.getTime("time");
+        
+        this.patientName = rs.getString("patient");
+        this.labWorkerName = rs.getString("labWorker");
+        this.examName = rs.getString("exam");
     }
 
     public int getResultId() {
@@ -141,6 +149,30 @@ public class Result implements Serializable{
         this.reportResult = reportResult;
     }
 
+    public String getPatientName() {
+        return patientName;
+    }
+
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
+
+    public String getLabWorkerName() {
+        return labWorkerName;
+    }
+
+    public void setLabWorkerName(String labWorkerName) {
+        this.labWorkerName = labWorkerName;
+    }
+
+    public String getExamName() {
+        return examName;
+    }
+
+    public void setExamName(String examName) {
+        this.examName = examName;
+    }
+    
     @Override
     public String toString() {
         return "Result{" + "resultId=" + resultId + ", appointmentLabId=" + appointmentLabId + ", patientId=" + patientId + ", date=" + date + ", time=" + time + ", labWorkerId=" + labWorkerId + ", examId=" + examId + ", orderResult=" + orderResult + ", reportResult=" + reportResult + '}';

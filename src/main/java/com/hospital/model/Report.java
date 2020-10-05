@@ -23,6 +23,16 @@ public class Report implements Serializable {
     private String report;
     private Date date;
     private Time time;
+    
+    private int specialtyId;
+    
+    private String patientName;
+    private String doctorName;
+    
+    private int quantity;
+    private String dates;
+    
+    private double total;
 
     public Report(Element e) {
         this.reportId = Integer.parseInt(e.getChildText("CODIGO"));
@@ -41,6 +51,9 @@ public class Report implements Serializable {
         this.report = rs.getString("report");
         this.date = rs.getDate("date");
         this.time = rs.getTime("time");
+        
+        this.patientName = rs.getString("patient");
+        this.doctorName = rs.getString("doctor");
     }
 
     public Report(HttpServletRequest request) throws UnsupportedEncodingException {
@@ -50,16 +63,23 @@ public class Report implements Serializable {
         this.report = new String(request.getParameter("report").getBytes("ISO-8859-1"), "UTF-8");
         this.date = ReadXml.getDate(request.getParameter("date"));
         this.time = ReadXml.getTime(request.getParameter("time"));
+        
+        this.specialtyId = Integer.parseInt(request.getParameter("specialtyId"));
     }
 
-    public Report(int reportId, int appointmentId, int patientId, Date date, Time time) {
-        this.reportId = reportId;
-        this.appointmentId = appointmentId;
-        this.patientId = patientId;
-        this.date = date;
-        this.time = time;
+    public Report(String doctorId, String doctorName, int quantity, String dates) {
+        this.doctorId = doctorId;
+        this.doctorName = doctorName;
+        this.quantity = quantity;
+        this.dates = dates;
     }
 
+    public Report(String doctorId, String doctorName, double total) {
+        this.doctorId = doctorId;
+        this.doctorName = doctorName;
+        this.total = total;
+    }
+    
     public int getReportId() {
         return reportId;
     }
@@ -116,6 +136,54 @@ public class Report implements Serializable {
         this.time = time;
     }
 
+    public int getSpecialtyId() {
+        return specialtyId;
+    }
+
+    public void setSpecialtyId(int specialtyId) {
+        this.specialtyId = specialtyId;
+    }
+
+    public String getPatientName() {
+        return patientName;
+    }
+
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
+
+    public String getDoctorName() {
+        return doctorName;
+    }
+
+    public void setDoctorName(String doctorName) {
+        this.doctorName = doctorName;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getDates() {
+        return dates;
+    }
+
+    public void setDates(String dates) {
+        this.dates = dates;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
+    }
+    
     @Override
     public String toString() {
         return "Report{" + "reportId=" + reportId + ", appointmentId=" + appointmentId + ", patientId=" + patientId + ", doctorId=" + doctorId + ", report=" + report + ", date=" + date + ", time=" + time + '}';
