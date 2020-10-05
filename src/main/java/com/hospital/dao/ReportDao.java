@@ -30,18 +30,47 @@ public class ReportDao {
      * @param r
      */
     public void insertReport(Report r) {
-        String query = "INSERT INTO REPORTS(report_id, patient_id, doctor_id, report, date, time) VALUES(?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
-            pst.setInt(1, r.getReportId());
-            //pst.setInt(2, r.getAppointmentId());
-            pst.setInt(2, r.getPatientId());
-            pst.setString(3, r.getDoctorId());
-            pst.setString(4, r.getReport());
-            pst.setDate(5, r.getDate());
-            pst.setTime(6, r.getTime());
+        int id = 0;
+        String queryApp = "INSERT INTO APPOINTMENTS(patient_id, doctor_id, specialty_id, date, time, status) VALUES(?, ?, (SELECT specialty_id FROM SPECIALTIES WHERE degree = ? LIMIT 1), ?, ?, ?)";
+        String queryRep = "INSERT INTO REPORTS(report_id, appointment_id, patient_id, doctor_id, report, date, time) VALUES(?, ?, ?, ?, ?, ?, ?)";
+        String queryIn = "INSERT INTO INCOMES(report_id, income) VALUES(?, (SELECT price_consultation FROM SPECIALTIES WHERE degree = ? LIMIT 1))";
+        PreparedStatement pst = null;
+        ResultSet rs = null;
+        try {
+            pst = this.transaction.prepareStatement(queryApp, PreparedStatement.RETURN_GENERATED_KEYS);
+            pst.setInt(1, r.getPatientId());
+            pst.setString(2, r.getDoctorId());
+            pst.setString(3, r.getDegree());
+            pst.setDate(4, r.getDate());
+            pst.setTime(5, r.getTime());
+            pst.setBoolean(6, true);
             pst.executeUpdate();
+            
+            rs = pst.getGeneratedKeys();
+            if(rs.next()) {
+                id = rs.getInt(1);
+            }
+            
+            pst = this.transaction.prepareStatement(queryRep);
+            pst.setInt(1, r.getReportId());
+            pst.setInt(2, id);
+            pst.setInt(3, r.getPatientId());
+            pst.setString(4, r.getDoctorId());
+            pst.setString(5, r.getReport());
+            pst.setDate(6, r.getDate());
+            pst.setTime(7, r.getTime());
+            pst.executeUpdate();
+            
+            pst = this.transaction.prepareStatement(queryIn);
+            pst.setInt(1, r.getReportId());
+            pst.setString(2, r.getDegree());
+            pst.executeUpdate();
+
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
+        } finally {
+            Conexion.close(rs);
+            Conexion.close(pst);
         }
     }
 
@@ -101,7 +130,7 @@ public class ReportDao {
             pst.setInt(1, id);
             pst.setInt(2, r.getSpecialtyId());
             pst.executeUpdate();
-            
+
             pst = this.transaction.prepareStatement(queryUpdate);
             pst.setBoolean(1, true);
             pst.setInt(2, r.getAppointmentId());

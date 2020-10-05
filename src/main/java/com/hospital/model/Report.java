@@ -24,6 +24,8 @@ public class Report implements Serializable {
     private Date date;
     private Time time;
     
+    private String degree;
+    
     private int specialtyId;
     
     private String patientName;
@@ -38,6 +40,7 @@ public class Report implements Serializable {
         this.reportId = Integer.parseInt(e.getChildText("CODIGO"));
         this.patientId = Integer.parseInt(e.getChildText("PACIENTE"));
         this.doctorId = e.getChildText("MEDICO");
+        this.degree = e.getChildText("TIPO");
         this.report = e.getChildText("INFORME");
         this.date = ReadXml.getDate(e.getChildText("FECHA"));
         this.time = ReadXml.getTime(e.getChildText("HORA"));
@@ -182,6 +185,14 @@ public class Report implements Serializable {
 
     public void setTotal(double total) {
         this.total = total;
+    }
+
+    public String getDegree() {
+        return degree;
+    }
+
+    public void setDegree(String degree) {
+        this.degree = degree;
     }
     
     @Override
