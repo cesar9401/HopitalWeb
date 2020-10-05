@@ -143,7 +143,10 @@ public class ReadXml {
         }
 
         ResultDao dao = new ResultDao(conexion);
+        AppointmentDao aDao = new AppointmentDao(conexion);
         for (Result r : results) {
+            int id = aDao.insertAppointmentLab(r);
+            r.setAppointmentLabId(id);
             dao.insertResult(r);
             System.out.println(r.toString());
         }

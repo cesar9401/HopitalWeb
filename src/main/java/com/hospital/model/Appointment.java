@@ -1,6 +1,7 @@
 package com.hospital.model;
 
 import com.hospital.controller.ReadXml;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -24,6 +25,8 @@ public class Appointment implements Serializable {
     private Time time;
     private boolean status;
     private boolean isAvailable;
+    
+    private InputStream order;
 
     private String degree;
     private String doctorName;
@@ -177,6 +180,14 @@ public class Appointment implements Serializable {
 
     public void setPatientName(String patientName) {
         this.patientName = patientName;
+    }
+
+    public InputStream getOrder() {
+        return order;
+    }
+
+    public void setOrder(InputStream order) {
+        this.order = order;
     }
 
     @Override

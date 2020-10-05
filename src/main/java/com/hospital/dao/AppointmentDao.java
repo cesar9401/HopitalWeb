@@ -1,6 +1,7 @@
 package com.hospital.dao;
 
 import com.hospital.model.Appointment;
+import com.hospital.model.Result;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -68,22 +69,31 @@ public class AppointmentDao {
     /**
      * Metodo para insertar una cita en laboratorio, recibe objeto de tipo cita
      *
-     * @param a
+     * @param r
+     * @return
      */
-    public void inserAppointmentLab(Appointment a) {
-        String query = "INSERT INTO APPOINTMENTS_LAB(appointment_lab_id, patient_id, doctor_id, exam_id, date, time, status) VALUES(?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
-            pst.setInt(1, a.getAppointmentId());
-            pst.setInt(2, a.getPatientId());
-            pst.setString(3, a.getDoctorId());
-            pst.setInt(4, a.getExamId());
-            pst.setDate(5, a.getDate());
-            pst.setTime(6, a.getTime());
-            pst.setBoolean(7, a.isStatus());
+    public int insertAppointmentLab(Result r) {
+        int id = 0;
+        String query = "INSERT INTO APPOINTMENTS_LAB(patient_id, doctor_id, exam_id, date, time, exam_order, status) VALUES(?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            //pst.setInt(1, a.getAppointmentId());
+            pst.setInt(1, r.getPatientId());
+            pst.setString(2, r.getDoctorId());
+            pst.setInt(3, r.getExamId());
+            pst.setDate(4, r.getDate());
+            pst.setTime(5, r.getTime());
+            pst.setBlob(6, r.getOrderResult());
+            pst.setBoolean(7, r.isStatus());
             pst.executeUpdate();
+
+            ResultSet rs = pst.getGeneratedKeys();
+            if (rs.next()) {
+                id = rs.getInt(1);
+            }
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
+        return id;
     }
 
     /**
@@ -154,7 +164,7 @@ public class AppointmentDao {
         try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setInt(1, appId);
             try (ResultSet rs = pst.executeQuery()) {
-                if(rs.next()) {
+                if (rs.next()) {
                     app = new Appointment(rs, false);
                 }
             }

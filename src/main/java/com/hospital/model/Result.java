@@ -33,12 +33,17 @@ public class Result implements Serializable{
     private String labWorkerName;
     private String examName;
 
+    private String doctorId;
+    private boolean status;
+    
     public Result(Element e) {
         //super(e);
         this.resultId = Integer.parseInt(e.getChildText("CODIGO"));
         this.patientId = Integer.parseInt(e.getChildText("PACIENTE"));
         this.examId = Integer.parseInt(e.getChildText("EXAMEN"));
         this.labWorkerId = e.getChildText("LABORATORISTA");
+        this.doctorId = e.getChildText("MEDICO");
+        this.status = true;
         try {
             String ord = e.getChildText("ORDEN");
             String rs = e.getChildText("INFORME");
@@ -67,7 +72,7 @@ public class Result implements Serializable{
         this.patientId = rs.getInt("patient_id");
         this.examId = rs.getInt("exam_id");
         this.labWorkerId = rs.getString("lab_worker_id");
-        this.orderResult = (InputStream) rs.getBlob("exam_order");
+        //this.orderResult = (InputStream) rs.getBlob("exam_order");
         this.reportResult = (InputStream) rs.getBlob("report");
         this.date = rs.getDate("date");
         this.time = rs.getTime("time");
@@ -171,6 +176,22 @@ public class Result implements Serializable{
 
     public void setExamName(String examName) {
         this.examName = examName;
+    }
+
+    public String getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(String doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
     }
     
     @Override
