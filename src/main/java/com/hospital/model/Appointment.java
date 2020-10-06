@@ -1,13 +1,16 @@
 package com.hospital.model;
 
 import com.hospital.controller.ReadXml;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
 import org.jdom2.Element;
 
 /**
@@ -25,12 +28,14 @@ public class Appointment implements Serializable {
     private Time time;
     private boolean status;
     private boolean isAvailable;
-    
+
     private InputStream order;
 
     private String degree;
     private String doctorName;
     private String patientName;
+
+    private String examName;
 
     public Appointment(java.sql.Time time, boolean isAvailable) {
         this.time = time;
@@ -51,13 +56,14 @@ public class Appointment implements Serializable {
         if (lab) {
             this.appointmentId = rs.getInt("appointment_lab_id");
             this.examId = rs.getInt("exam_id");
+            this.examName = rs.getString("exam_name");
         } else {
             this.appointmentId = rs.getInt("appointment_id");
             this.specialtyId = rs.getInt("specialty_id");
-            this.doctorName = rs.getString("doctor_name");
             this.degree = rs.getString("degree");
-            this.patientName = rs.getString("patient_name");
         }
+        this.patientName = rs.getString("patient_name");
+        this.doctorName = rs.getString("doctor_name");
         this.patientId = rs.getInt("patient_id");
         this.doctorId = rs.getString("doctor_id");
         this.date = rs.getDate("date");
@@ -67,14 +73,30 @@ public class Appointment implements Serializable {
     }
 
     public Appointment(HttpServletRequest request, boolean lab) {
-        this.doctorId = request.getParameter("doctorId");
-        this.patientId = Integer.parseInt(request.getParameter("patientId"));
-        this.specialtyId = Integer.parseInt(request.getParameter("specialty"));
-        this.time = ReadXml.getTime(request.getParameter("AppTime"));
-        this.date = (java.sql.Date) request.getSession().getAttribute("date");
-        
-        if(lab) {
-            System.out.println("lab");
+        if (lab) {
+            this.doctorId = request.getParameter("doctorId");
+            this.patientId = Integer.parseInt(request.getParameter("patientId"));
+            this.examId = Integer.parseInt(request.getParameter("examId"));
+            this.date = ReadXml.getDate(request.getParameter("date-exam"));
+            this.time = ReadXml.getTime(request.getParameter("AppTime"));
+            boolean ord = request.getParameter("order").equals("true");
+            if(ord) {
+                try {
+                    Part filePart = request.getPart("file");
+                    this.order = filePart.getInputStream();
+                    System.out.println("Input: " + order.toString());
+                    
+                } catch (IOException | ServletException ex) {
+                    ex.printStackTrace(System.out);
+                }
+            }
+        } else {
+            this.doctorId = request.getParameter("doctorId");
+            this.patientId = Integer.parseInt(request.getParameter("patientId"));
+            this.specialtyId = Integer.parseInt(request.getParameter("specialty"));
+            this.time = ReadXml.getTime(request.getParameter("AppTime"));
+            this.date = (java.sql.Date) request.getSession().getAttribute("date");
+            this.status = false;
         }
     }
 
@@ -188,6 +210,14 @@ public class Appointment implements Serializable {
 
     public void setOrder(InputStream order) {
         this.order = order;
+    }
+
+    public String getExamName() {
+        return examName;
+    }
+
+    public void setExamName(String examName) {
+        this.examName = examName;
     }
 
     @Override

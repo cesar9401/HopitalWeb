@@ -108,7 +108,9 @@ public class AppointmentDao {
         List<Appointment> appointments = new ArrayList<>();
         String query;
         if (lab) {
-            query = "SELECT * FROM APPOINTMENTS_LAB WHERE patient_id = ? AND status = ? ORDER BY date, time";
+            //query = "SELECT * FROM APPOINTMENTS_LAB WHERE patient_id = ? AND status = ? ORDER BY date, time";
+            query = "SELECT a.*, d.name AS doctor_name, p.name AS patient_name, e.name AS exam_name FROM APPOINTMENTS_LAB a INNER JOIN DOCTORS d ON a.doctor_id = d.doctor_id INNER JOIN PATIENTS p ON a.patient_id = p.patient_id INNER JOIN EXAMS e ON a.exam_id = e.exam_id "
+                    + "WHERE a.patient_id = ? AND status = ? ORDER BY date, time";
         } else {
             query = "SELECT a.*, d.name AS doctor_name, s.degree, p.name AS patient_name FROM APPOINTMENTS a INNER JOIN DOCTORS d ON a.doctor_id = d.doctor_id "
                     + "INNER JOIN SPECIALTIES s ON a.specialty_id = s.specialty_id INNER JOIN PATIENTS p ON a.patient_id = p.patient_id "
@@ -172,5 +174,44 @@ public class AppointmentDao {
             ex.printStackTrace(System.out);
         }
         return app;
+    }
+
+    public List<Appointment> getAppointmentLab(int examId, java.sql.Date date) {
+        List<Appointment> app = new ArrayList<>();
+        String query = "SELECT a.*, d.name AS doctor_name, p.name AS patient_name, e.name AS exam_name FROM APPOINTMENTS_LAB a INNER JOIN DOCTORS d ON a.doctor_id = d.doctor_id INNER JOIN PATIENTS p ON a.patient_id = p.patient_id INNER JOIN EXAMS e ON a.exam_id = e.exam_id "
+                + "WHERE a.exam_id = ? AND a.date = ? ORDER BY date, time";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setInt(1, examId);
+            pst.setDate(2, date);
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    app.add(new Appointment(rs, true));
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+
+        return app;
+    }
+
+    public void createAppointmentLab(Appointment a) {
+        int id = 0;
+        String query = "INSERT INTO APPOINTMENTS_LAB(patient_id, doctor_id, exam_id, date, time, exam_order, status) VALUES(?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            //pst.setInt(1, a.getAppointmentId());
+            pst.setInt(1, a.getPatientId());
+            pst.setString(2, a.getDoctorId());
+            pst.setInt(3, a.getExamId());
+            pst.setDate(4, a.getDate());
+            pst.setTime(5, a.getTime());
+            pst.setBlob(6, a.getOrder());
+            pst.setBoolean(7, a.isStatus());
+            pst.executeUpdate();
+
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+
     }
 }

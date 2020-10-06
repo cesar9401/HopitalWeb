@@ -10,7 +10,7 @@
                     <a class="nav-link" href="MainController?action=newAppointment">Nueva Cita<span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#exams">Link2</a>
+                    <a class="nav-link" href="LabController?action=appointmentLab">Agendar Examen</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Pricing</a>
