@@ -54,7 +54,7 @@
                                 <tr>
                                     <th scope="row"><span class="badge badge-primary">Cita Médica</span></th>
                                     <td>${a.doctorName}</td>
-                                    <td><span class="badge badge-warning">${a.degree}</span></td>
+                                    <td><span class="badge badge-success">${a.degree}</span></td>
                                     <td>${a.time}</td>
                                     <td>${a.date}</td>
                                 </tr>
@@ -62,8 +62,8 @@
                             <c:forEach var="appL" items="${appLab}">
                                 <tr>
                                     <th scope="row"><span class="badge badge-secondary">Cita Laboratorio</span></th>
-                                    <th>${appL.doctorId}</th>
-                                    <td>${appL.examId}</td>
+                                    <td><span class="font-weight-bold">Solicita: </span>${appL.doctorName}</td>
+                                    <td><span class="badge badge-warning">${appL.examName}</span></td>
                                     <td>${appL.time}</td>
                                     <td>${appL.date}</td>
                                 </tr>

@@ -4,19 +4,25 @@ import com.hospital.controller.ReadXml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
 import org.jdom2.Element;
 
 /**
  *
  * @author cesar31
  */
-public class Result implements Serializable{
+public class Result implements Serializable {
 
     private int resultId;
     private int appointmentLabId;
@@ -28,14 +34,14 @@ public class Result implements Serializable{
     private int examId;
     private InputStream orderResult;
     private InputStream reportResult;
-    
+
     private String patientName;
     private String labWorkerName;
     private String examName;
 
     private String doctorId;
     private boolean status;
-    
+
     public Result(Element e) {
         //super(e);
         this.resultId = Integer.parseInt(e.getChildText("CODIGO"));
@@ -63,7 +69,7 @@ public class Result implements Serializable{
             System.out.println("Pruebas sin archivos");
         }
         this.date = ReadXml.getDate(e.getChildText("FECHA"));
-        this.time = ReadXml.getTime(e.getChildText("HORA"));        
+        this.time = ReadXml.getTime(e.getChildText("HORA"));
     }
 
     public Result(ResultSet rs) throws SQLException {
@@ -76,10 +82,30 @@ public class Result implements Serializable{
         this.reportResult = (InputStream) rs.getBlob("report");
         this.date = rs.getDate("date");
         this.time = rs.getTime("time");
-        
+
         this.patientName = rs.getString("patient");
         this.labWorkerName = rs.getString("labWorker");
         this.examName = rs.getString("exam");
+    }
+
+    public Result(HttpServletRequest request) {
+        this.appointmentLabId = Integer.parseInt(request.getParameter("appointmentId"));
+        this.patientId = Integer.parseInt(request.getParameter("patientId"));
+        this.examId = Integer.parseInt(request.getParameter("examId"));
+        this.labWorkerId = request.getParameter("labWorkerId");
+        this.date = ReadXml.getDate(request.getParameter("date"));
+        this.time = ReadXml.getTime(request.getParameter("time"));
+
+        Part filePart;
+        try {
+            filePart = request.getPart("input-result");
+            this.reportResult = filePart.getInputStream();
+            System.out.println("filePart: " + filePart.getSubmittedFileName());
+            System.out.println("reportResult = " + reportResult.toString());
+            
+        } catch (IOException | ServletException ex) {
+            ex.printStackTrace(System.out);
+        }
     }
 
     public int getResultId() {
@@ -193,7 +219,7 @@ public class Result implements Serializable{
     public void setStatus(boolean status) {
         this.status = status;
     }
-    
+
     @Override
     public String toString() {
         return "Result{" + "resultId=" + resultId + ", appointmentLabId=" + appointmentLabId + ", patientId=" + patientId + ", date=" + date + ", time=" + time + ", labWorkerId=" + labWorkerId + ", examId=" + examId + ", orderResult=" + orderResult + ", reportResult=" + reportResult + '}';

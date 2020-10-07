@@ -2,12 +2,19 @@ package com.hospital.dao;
 
 import com.hospital.model.Appointment;
 import com.hospital.model.Result;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  *
@@ -16,6 +23,8 @@ import java.util.List;
 public class AppointmentDao {
 
     private Connection transaction;
+    private final long CERO_H = 21600000;
+    private final long UNO_H = 3600000;
 
     public AppointmentDao() {
     }
@@ -157,17 +166,23 @@ public class AppointmentDao {
         return appointments;
     }
 
-    public Appointment getAppointmentById(int appId) {
+    public Appointment getAppointmentById(int appId, boolean lab) {
         Appointment app = null;
-        String query = "SELECT a.*, d.name AS doctor_name, s.degree, p.name AS patient_name FROM APPOINTMENTS a INNER JOIN DOCTORS d ON a.doctor_id = d.doctor_id "
-                + "INNER JOIN SPECIALTIES s ON a.specialty_id = s.specialty_id INNER JOIN PATIENTS p ON a.patient_id = p.patient_id "
-                + "WHERE a.appointment_id = ? LIMIT 1";
+        String query;
+        if (lab) {
+            query = "SELECT a.*, d.name AS doctor_name, p.name AS patient_name, e.name AS exam_name FROM APPOINTMENTS_LAB a INNER JOIN DOCTORS d ON a.doctor_id = d.doctor_id INNER JOIN PATIENTS p ON a.patient_id = p.patient_id INNER JOIN EXAMS e ON a.exam_id = e.exam_id "
+                    + "WHERE a.appointment_lab_id = ? LIMIT 1";
+        } else {
+            query = "SELECT a.*, d.name AS doctor_name, s.degree, p.name AS patient_name FROM APPOINTMENTS a INNER JOIN DOCTORS d ON a.doctor_id = d.doctor_id "
+                    + "INNER JOIN SPECIALTIES s ON a.specialty_id = s.specialty_id INNER JOIN PATIENTS p ON a.patient_id = p.patient_id "
+                    + "WHERE a.appointment_id = ? LIMIT 1";
+        }
 
         try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setInt(1, appId);
             try (ResultSet rs = pst.executeQuery()) {
                 if (rs.next()) {
-                    app = new Appointment(rs, false);
+                    app = new Appointment(rs, lab);
                 }
             }
         } catch (SQLException ex) {
@@ -212,6 +227,52 @@ public class AppointmentDao {
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         }
-
     }
+
+    public List<Appointment> getAppointmentTotalLab(int examId, java.sql.Date date) {
+        List<Appointment> appLab = new ArrayList<>();
+        List<Appointment> app = getAppointmentLab(examId, date);
+
+        java.sql.Time time = new java.sql.Time(CERO_H);
+        for (int i = 0; i < 24; i++) {
+            boolean isApp = false;
+            for (Appointment a : app) {
+                if (time.equals(a.getTime())) {
+                    appLab.add(a);
+                    isApp = true;
+                    break;
+                }
+            }
+            if (!isApp) {
+                java.sql.Time tmp = new Time(time.getTime());
+                appLab.add(new Appointment(tmp, true));
+            }
+            time.setTime(time.getTime() + UNO_H);
+        }
+
+        return appLab;
+    }
+
+    public void getOrder(int appointmentLabId, HttpServletResponse response) {
+        String query = "SELECT exam_order FROM APPOINTMENTS_LAB WHERE appointment_lab_id = ?";
+
+        response.setContentType("application/pdf");
+        InputStream inputStream = null;
+
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setInt(1, appointmentLabId);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    inputStream = new ByteArrayInputStream(rs.getBytes("exam_order"));
+                }
+            }
+            byte[] data = new byte[inputStream.available()];
+            inputStream.read(data, 0, inputStream.available());
+            response.getOutputStream().write(data);
+            inputStream.close();
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace(System.out);
+        }
+    }
+
 }

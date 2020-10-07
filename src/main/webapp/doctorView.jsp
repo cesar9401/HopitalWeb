@@ -68,7 +68,7 @@
                                     <th scope="col">Paciente</th>
                                     <th scope="col">Tipo Consulta</th>
                                     <th scope="col">Hora</th>
-                                    <th scope="col">Atender</th>
+                                    <th scope="col">Opci&oacute;n</th>
                                 </tr>
                             </thead>
                             <tbody>

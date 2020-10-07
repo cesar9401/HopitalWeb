@@ -111,7 +111,7 @@ public class DoctorController extends HttpServlet {
      */
     private void setReportePatient(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int appId = Integer.parseInt(request.getParameter("action"));
-        Appointment app = appointmentDao.getAppointmentById(appId);
+        Appointment app = appointmentDao.getAppointmentById(appId, false);
         Patient patient = patientDao.getPatientById(app.getPatientId());
 
         //Datos para jsp
@@ -173,6 +173,8 @@ public class DoctorController extends HttpServlet {
      *
      * @param request
      * @param response
+     * @throws javax.servlet.ServletException
+     * @throws java.io.IOException
      */
     public void setLabWorkersAdmin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         List<LabWorker> labWorkers = labDao.getLabWorkers();
@@ -201,13 +203,7 @@ public class DoctorController extends HttpServlet {
         switch (action) {
             case "changeDateDoctor":
                 //Cambiar fecha del doctor
-                String fecha = request.getParameter("date");
-                String doctorId = request.getParameter("doctorId");
-                java.sql.Date date = ReadXml.getDate(fecha);
-
-                request.getSession().setAttribute("date", date);
-                Doctor doctor = doctorDao.getDoctor(doctorId);
-                main.setProfileDoctor(request, response, doctor);
+                changeDateDoctor(request, response);
                 break;
             case "newReport":
                 //Crear informe para un paciente
@@ -239,6 +235,16 @@ public class DoctorController extends HttpServlet {
                 searchDoctors(request, response);
                 break;
         }
+    }
+
+    private void changeDateDoctor(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String fecha = request.getParameter("date");
+        String doctorId = request.getParameter("doctorId");
+        java.sql.Date date = ReadXml.getDate(fecha);
+
+        request.getSession().setAttribute("date", date);
+        Doctor doctor = doctorDao.getDoctor(doctorId);
+        main.setProfileDoctor(request, response, doctor);
     }
 
     /**

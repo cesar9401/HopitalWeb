@@ -24,9 +24,9 @@
                 </div>
                 <div class="derecha">
                     <form action="MainController" method="post" class="formulario" id="formulario" name="form1" onsubmit="return validarFormulario(this)">
-                        <input type="email" id="email" class="input" name="email" placeholder="Email" value="mail4917@othermail.com" required>
+                        <input type="email" id="email" class="input" name="email" placeholder="Email" value="mailAFZ@hospital.com" required>
                         <br />
-                        <input type="password" name="pass" id="pass" class="input" name="pass" placeholder="Contraseña" value="c)vZ,@MYa3]S.RN*" required>
+                        <input type="password" name="pass" id="pass" class="input" name="pass" placeholder="Contraseña" value="C9^r:F/j" required>
                         <br />
                         <select name="tipoUsuario" class="input lista" id="lista">
                             <option value="PATIENTS">Paciente</option>

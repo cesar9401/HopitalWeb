@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.ServletException;
@@ -319,10 +320,10 @@ public class MainController extends HttpServlet {
 
         request.getSession().setAttribute("user", p.getPatientId());
         request.getSession().setAttribute("profile", p);
-        request.getSession().setAttribute("results", results);
-        request.getSession().setAttribute("reports", reports);
-        request.getSession().setAttribute("app", app);
-        request.getSession().setAttribute("appLab", appLab);
+        request.setAttribute("results", results);
+        request.setAttribute("reports", reports);
+        request.setAttribute("app", app);
+        request.setAttribute("appLab", appLab);
         request.getSession().setAttribute("specialties", specialties);
         request.getRequestDispatcher("patientView.jsp").forward(request, response);
     }
@@ -359,13 +360,47 @@ public class MainController extends HttpServlet {
      * @param request
      * @param response
      * @param labWorker
+     * @throws javax.servlet.ServletException
+     * @throws java.io.IOException
      */
-    private void setProfileLabWorker(HttpServletRequest request, HttpServletResponse response, LabWorker labWorker) throws ServletException, IOException {
+    public void setProfileLabWorker(HttpServletRequest request, HttpServletResponse response, LabWorker labWorker) throws ServletException, IOException {
         Exam exam = examDao.getExamById(labWorker.getExamId());
+
+        java.sql.Date date = (java.sql.Date) request.getSession().getAttribute("date");
+        if (date == null) {
+            java.util.Date now = new java.util.Date();
+            date = new java.sql.Date(now.getTime());
+            request.getSession().setAttribute("date", date);
+        } else {
+            request.getSession().setAttribute("date", date);
+        }
+        
+        boolean work = timeToWork(date, labWorker);
+        System.out.println("work = " + work);
+        
+        //List<Appointment> appointmentsLab = appointmentDao.getAppointmentTotalLab(labWorker.getExamId(), date);
+        List<Appointment> appointments = appointmentDao.getAppointmentLab(labWorker.getExamId(), date);
+
+        //Atributos para el perfil del laboratorista
+        request.setAttribute("work", work);
         request.getSession().setAttribute("user", labWorker.getLabWorkerId());
         request.getSession().setAttribute("profile", labWorker);
         request.setAttribute("exam", exam);
+        request.setAttribute("appointmentsLab", appointments);
         request.getRequestDispatcher("labWorkerView.jsp").forward(request, response);
+    }
+    
+    private boolean timeToWork(java.sql.Date date, LabWorker labWorker) {
+        Day today = Day.Domingo;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int day = calendar.get(Calendar.DAY_OF_WEEK);
+        for(Day d : Day.values()) {
+            if(day == d.getDayId()) {
+                today = d;
+            }
+        }
+        return labWorker.getDays().contains(today);
     }
 
     /**
@@ -418,9 +453,6 @@ public class MainController extends HttpServlet {
             time.setTime(time.getTime() + milli);
         }
 
-        for (Appointment p : newApp) {
-            System.out.println(p.toString());
-        }
         return newApp;
     }
 

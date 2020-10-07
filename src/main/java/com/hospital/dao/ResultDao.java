@@ -1,5 +1,6 @@
 package com.hospital.dao;
 
+import com.hospital.conexion.Conexion;
 import com.hospital.model.Result;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -43,7 +46,7 @@ public class ResultDao {
             pst.setDate(7, r.getDate());
             pst.setTime(8, r.getTime());
             pst.executeUpdate();
-            
+
             pst = this.transaction.prepareStatement(queryIn);
             pst.setInt(1, r.getResultId());
             pst.setInt(2, r.getExamId());
@@ -75,5 +78,59 @@ public class ResultDao {
             ex.printStackTrace(System.out);
         }
         return results;
+    }
+
+    /**
+     * Metodo para ingresar un nuevo resultado, actualizar la cita como
+     * realizada y registrar el ingreso o pago
+     *
+     * @param r
+     */
+    public void insertNewResult(Result r) {
+        int id = 0;
+        String queryApp = "UPDATE APPOINTMENTS_LAB SET status = ? WHERE appointment_lab_id = ?";
+        String queryRes = "INSERT INTO RESULTS(appointment_lab_id, patient_id, exam_id, lab_worker_id, report, date, time) VALUES(?, ?, ?, ?, ?, ?, ?)";
+        String queryIn = "INSERT INTO INCOMES(result_id, income) VALUES(?, (SELECT price FROM EXAMS WHERE exam_id = ? LIMIT 1))";
+
+        PreparedStatement pst = null;
+        try {
+            this.transaction.setAutoCommit(false);
+            pst = this.transaction.prepareStatement(queryApp);
+            pst.setBoolean(1, true);
+            pst.setInt(2, r.getAppointmentLabId());
+            pst.executeUpdate();
+
+            pst = this.transaction.prepareStatement(queryRes, PreparedStatement.RETURN_GENERATED_KEYS);
+            pst.setInt(1, r.getAppointmentLabId());
+            pst.setInt(2, r.getPatientId());
+            pst.setInt(3, r.getExamId());
+            pst.setString(4, r.getLabWorkerId());
+            pst.setBlob(5, r.getReportResult());
+            pst.setDate(6, r.getDate());
+            pst.setTime(7, r.getTime());
+            pst.executeUpdate();
+            
+            try (ResultSet rs = pst.getGeneratedKeys()) {
+                if(rs.next()) {
+                    id = rs.getInt(1);
+                }
+            }
+            
+            pst = this.transaction.prepareStatement(queryIn);
+            pst.setInt(1, id);
+            pst.setInt(2, r.getExamId());
+            pst.executeUpdate();
+            
+            this.transaction.commit();
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+            try {
+                this.transaction.rollback();
+            } catch (SQLException ex1) {
+                ex1.printStackTrace(System.out);
+            }
+        } finally {
+            Conexion.close(pst);
+        }
     }
 }

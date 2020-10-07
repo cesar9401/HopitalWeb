@@ -24,8 +24,6 @@ import javax.servlet.http.HttpServletResponse;
 @MultipartConfig(maxFileSize = 16177215)
 public class LabController extends HttpServlet {
 
-    private final long CERO_H = 21600000;
-    private final long UNO_H = 3600000;
     private final MainController main = new MainController();
     private final DoctorController doctorController = new DoctorController();
     private final Connection conexion = main.getConexion();
@@ -147,6 +145,10 @@ public class LabController extends HttpServlet {
                 //Agendar nueva cita en laboratorio
                 setAppointmentLab(request, response);
                 break;
+            case "changeDateLab":
+                //Cambiar fecha para el laboratorio
+                changeDateLabWorker(request, response);
+                break;
         }
 
     }
@@ -246,7 +248,7 @@ public class LabController extends HttpServlet {
         String doctorId = request.getParameter("doctor");
         java.sql.Date date = ReadXml.getDate(request.getParameter("date"));
 
-        List<Appointment> appLab = getAppointmentLab(examId, date);
+        List<Appointment> appLab = appDao.getAppointmentTotalLab(examId, date);
         //Atributos para el fomulario
         request.setAttribute("appointments", appLab);
         request.setAttribute("exam", exam);
@@ -255,46 +257,40 @@ public class LabController extends HttpServlet {
         request.getRequestDispatcher("appointmentLab.jsp").forward(request, response);
     }
 
-    private List<Appointment> getAppointmentLab(int examId, java.sql.Date date) {
-        List<Appointment> appLab = new ArrayList<>();
-        List<Appointment> app = appDao.getAppointmentLab(examId, date);
-
-        java.sql.Time time = new java.sql.Time(CERO_H);
-        System.out.println("time: " + time);
-        for (int i = 0; i < 24; i++) {
-            boolean isApp = false;
-            for (Appointment a : app) {
-                if (time.equals(a.getTime())) {
-                    appLab.add(a);
-                    isApp = true;
-                    break;
-                }
-            }
-            if (!isApp) {
-                java.sql.Time tmp = new Time(time.getTime());
-                appLab.add(new Appointment(tmp, true));
-            }
-            time.setTime(time.getTime() + UNO_H);
-        }
-
-        for (Appointment a : appLab) {
-            System.out.println(a.toString());
-        }
-
-        return appLab;
-    }
-
     /**
      * Agendar nueva cita en laboratorio
      *
      * @param request
      * @param response
      */
-    private void setAppointmentLab(HttpServletRequest request, HttpServletResponse response) {
+    private void setAppointmentLab(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Appointment appLab = new Appointment(request, true);
         System.out.println(appLab.toString());
-        System.out.println("ExamId: " + appLab.getExamId());
         appDao.createAppointmentLab(appLab);
+        List<Appointment> appointments = appDao.getAppointmentTotalLab(appLab.getExamId(), appLab.getDate());
+        Exam exam = examDao.getExamById(appLab.getExamId());
+        //Atributos para el fomulario
+        request.setAttribute("appointments", appointments);
+        request.setAttribute("exam", exam);
+        request.setAttribute("doctorId", appLab.getDoctorId());
+        request.setAttribute("date", appLab.getDate());
+        request.setAttribute("myApp", appLab);
+        request.getRequestDispatcher("appointmentLab.jsp").forward(request, response);
+    }
+
+    /**
+     * Cambiar fecha para el laboratorista y enviar las citas que le corresponden
+     * @param request
+     * @param response 
+     */
+    private void changeDateLabWorker(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String fecha = request.getParameter("date");
+        String labId = request.getParameter("labId");
+        LabWorker lab = labDao.getLabWorkerById(labId);
+        
+        java.sql.Date date = ReadXml.getDate(fecha);
+        request.getSession().setAttribute("date", date);
+        main.setProfileLabWorker(request, response, lab);
     }
 
     /**

@@ -115,6 +115,26 @@
             </section>
         </c:if>
 
+        <!-- Modal para confirmar cita en laboratorio-->
+        <div class="modal fade" id="modal-lab" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Cita Agendada</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="info-modal-lab"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <%@include file="js.html" %>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
         <script type="text/javascript">
@@ -147,8 +167,17 @@
                     $('#exampleFormControlFile1').prop('required', false);
                     </c:otherwise>
                 </c:choose>
-
                 };
+            </script>
+        </c:if>
+
+        <c:if test="${myApp != null}">
+            <script>
+                var p = document.getElementById('info-modal-lab');
+                p.textContent = "Se ha agendado correctamente su cita para el dia ${myApp.date} a las ${myApp.time}";
+                $(document).ready(function () {
+                    $('#modal-lab').modal('show');
+                });
             </script>
         </c:if>
     </body>
