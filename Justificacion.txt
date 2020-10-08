@@ -1,0 +1,6 @@
+
+En reporte se agrego el tipo de consulta, para poder agregar en la tabla de citas en la base de datos.
+
+En resultado se agrego al medico que emitio la orden del examen, ya que era requerido en uno de los reportes.
+
+Se agrego el tipo de cita por que era necesario en los reportes.
