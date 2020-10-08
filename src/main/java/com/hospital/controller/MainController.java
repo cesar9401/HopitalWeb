@@ -83,13 +83,16 @@ public class MainController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
-        System.out.println("action = " + action);
         switch (action) {
+            case "takeChoice":
+                //Cargar datos o dirigir al login
+                takeChoice(request, response);
+                break;
             case "singOff":
                 //Cerrar Sesion
                 HttpSession session = request.getSession();
                 session.invalidate();
-                request.getRequestDispatcher("index.jsp").forward(request, response);
+                request.getRequestDispatcher("login.jsp").forward(request, response);
                 break;
             case "newAppointment":
                 //Nueva cita
@@ -130,6 +133,21 @@ public class MainController extends HttpServlet {
                 request.setAttribute("appointments", app);
                 request.getRequestDispatcher("newAppointment.jsp").forward(request, response);
                 break;
+        }
+    }
+
+    /**
+     * Metodo para elegir si cargar datos o dirigir al login
+     *
+     * @param request
+     * @param response
+     */
+    private void takeChoice(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        List<Administrator> admins = administratorDao.getAdmins();
+        if (admins.isEmpty()) {
+            request.getRequestDispatcher("uploadData.jsp").forward(request, response);
+        } else {
+            request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }
 
@@ -190,7 +208,8 @@ public class MainController extends HttpServlet {
             Part filePart = request.getPart("file");
             ReadXml read = new ReadXml(filePart);
             read.laodData();
-
+            request.setAttribute("upload", true);
+            request.getRequestDispatcher("login.jsp").forward(request, response);
         } catch (IOException | ServletException ex) {
             ex.printStackTrace(System.out);
         }
@@ -424,7 +443,7 @@ public class MainController extends HttpServlet {
      */
     private void setErrorLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setAttribute("error", true);
-        request.getRequestDispatcher("index.jsp").forward(request, response);
+        request.getRequestDispatcher("login.jsp").forward(request, response);
     }
 
     /**
@@ -468,9 +487,9 @@ public class MainController extends HttpServlet {
 
     /**
      * Agregar un nuevo paciente a la base de datos
-     * 
+     *
      * @param request
-     * @param response 
+     * @param response
      */
     private void addPatient(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, ServletException, IOException {
         Patient patient = new Patient(request);

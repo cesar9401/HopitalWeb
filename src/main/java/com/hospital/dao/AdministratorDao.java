@@ -6,6 +6,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -96,5 +100,18 @@ public class AdministratorDao {
             ex.printStackTrace(System.out);
         }
         return admin;
+    }
+
+    public List<Administrator> getAdmins() {
+        List<Administrator> admins = new ArrayList<>();
+        String query = "SELECT * FROM ADMINISTRATORS";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query); ResultSet rs = pst.executeQuery()) {
+            while (rs.next()) {
+                admins.add(new Administrator(rs.getString("admin_id"), rs.getString("dpi"), rs.getString("name"), rs.getString("password")));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        return admins;
     }
 }
