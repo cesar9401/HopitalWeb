@@ -5,6 +5,7 @@ import com.hospital.dao.*;
 import com.hospital.model.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.Time;
 import java.util.ArrayList;
@@ -125,8 +126,8 @@ public class MainController extends HttpServlet {
                 Doctor doctor = doctorDao.getDoctor(doctorId);
                 doctor.setSpecialties(specialtyDao.getSpecialtiesByDoctor(doctorId));
                 List<Appointment> app = getAppointmentsByDoctor(doctor, date, false);
-                request.getSession().setAttribute("doctor", doctor);
-                request.getSession().setAttribute("appointments", app);
+                request.setAttribute("doctor", doctor);
+                request.setAttribute("appointments", app);
                 request.getRequestDispatcher("newAppointment.jsp").forward(request, response);
                 break;
         }
@@ -147,12 +148,15 @@ public class MainController extends HttpServlet {
         String action = request.getParameter("action");
         switch (action) {
             case "load":
+                //Cargar datos a la DB
                 loadData(request, response);
                 break;
             case "login":
+                //Proceso de iniciar sesion
                 initLogin(request, response);
                 break;
             case "d_specialties":
+                //Buscar doctor por especialidad para citas
                 Integer specialtyId = Integer.parseInt(request.getParameter("specialties"));
                 java.sql.Date date = ReadXml.getDate(request.getParameter("date"));
                 List<Doctor> doctors = doctorDao.getDoctorsBySpeciality(specialtyId);
@@ -161,10 +165,16 @@ public class MainController extends HttpServlet {
                 request.getRequestDispatcher("appointment.jsp").forward(request, response);
                 break;
             case "changeDate":
+                //Cambiar fecha para agendar una consulta con doctor
                 changeDateApp(request, response);
                 break;
             case "newAppointment":
+                //Nueva cita en la DB
                 setNewAppointment(request, response);
+                break;
+            case "addPatient":
+                //Agregar nuevo paciente
+                addPatient(request, response);
                 break;
         }
     }
@@ -374,10 +384,10 @@ public class MainController extends HttpServlet {
         } else {
             request.getSession().setAttribute("date", date);
         }
-        
+
         boolean work = timeToWork(date, labWorker);
         System.out.println("work = " + work);
-        
+
         //List<Appointment> appointmentsLab = appointmentDao.getAppointmentTotalLab(labWorker.getExamId(), date);
         List<Appointment> appointments = appointmentDao.getAppointmentLab(labWorker.getExamId(), date);
 
@@ -389,14 +399,14 @@ public class MainController extends HttpServlet {
         request.setAttribute("appointmentsLab", appointments);
         request.getRequestDispatcher("labWorkerView.jsp").forward(request, response);
     }
-    
+
     private boolean timeToWork(java.sql.Date date, LabWorker labWorker) {
         Day today = Day.Domingo;
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         int day = calendar.get(Calendar.DAY_OF_WEEK);
-        for(Day d : Day.values()) {
-            if(day == d.getDayId()) {
+        for (Day d : Day.values()) {
+            if (day == d.getDayId()) {
                 today = d;
             }
         }
@@ -454,6 +464,20 @@ public class MainController extends HttpServlet {
         }
 
         return newApp;
+    }
+
+    /**
+     * Agregar un nuevo paciente a la base de datos
+     * 
+     * @param request
+     * @param response 
+     */
+    private void addPatient(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, ServletException, IOException {
+        Patient patient = new Patient(request);
+        int id = patientDao.createNewPatient(patient);
+        patient = patientDao.getPatientById(id);
+        request.setAttribute("success", patient.getName());
+        setProfilePatient(request, response, patient);
     }
 
     /**

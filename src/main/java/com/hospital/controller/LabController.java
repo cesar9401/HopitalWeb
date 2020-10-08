@@ -250,7 +250,7 @@ public class LabController extends HttpServlet {
 
         List<Appointment> appLab = appDao.getAppointmentTotalLab(examId, date);
         //Atributos para el fomulario
-        request.setAttribute("appointments", appLab);
+        request.setAttribute("appointmentsLab", appLab);
         request.setAttribute("exam", exam);
         request.setAttribute("doctorId", doctorId);
         request.setAttribute("date", date);
@@ -270,7 +270,7 @@ public class LabController extends HttpServlet {
         List<Appointment> appointments = appDao.getAppointmentTotalLab(appLab.getExamId(), appLab.getDate());
         Exam exam = examDao.getExamById(appLab.getExamId());
         //Atributos para el fomulario
-        request.setAttribute("appointments", appointments);
+        request.setAttribute("appointmentsLab", appointments);
         request.setAttribute("exam", exam);
         request.setAttribute("doctorId", appLab.getDoctorId());
         request.setAttribute("date", appLab.getDate());

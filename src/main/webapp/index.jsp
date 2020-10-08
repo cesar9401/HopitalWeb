@@ -36,6 +36,8 @@
                         </select>
                         <br />
                         <input type="submit" name="action" value="login" class="boton">
+                        <br />
+                        <a href="patientInformation.jsp" class="boton" >Registrarme</a>
                     </form>
                 </div>
             </section>

@@ -83,7 +83,7 @@ public class ReportDao {
     public List<Report> getReportsByPatient(int patientId) {
         List<Report> reports = new ArrayList<>();
         //String query = "SELECT * FROM REPORTS WHERE patient_id = ? ORDER BY date";
-        String query = "SELECT r.*, p.name AS patient, d.name AS doctor FROM REPORTS r INNER JOIN PATIENTS p ON r.patient_id = p.patient_id INNER JOIN DOCTORS d ON r.doctor_id = d.doctor_id "
+        String query = "SELECT r.*, p.name AS patient, d.name AS doctor, s.degree AS kind FROM REPORTS r INNER JOIN PATIENTS p ON r.patient_id = p.patient_id INNER JOIN DOCTORS d ON r.doctor_id = d.doctor_id INNER JOIN APPOINTMENTS a ON r.appointment_id = a.appointment_id INNER JOIN SPECIALTIES s ON s.specialty_id = a.specialty_id "
                 + "WHERE r.patient_id = ? ORDER BY date, time";
         try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setInt(1, patientId);

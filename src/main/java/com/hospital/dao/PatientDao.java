@@ -112,4 +112,34 @@ public class PatientDao {
 
         return patients;
     }
+
+    /**
+     * Metodo para insertar un nuevo paciente a la base de datos
+     * @param p
+     * @return 
+     */
+    public int createNewPatient(Patient p) {
+        int id = 0;
+        String query = "INSERT INTO PATIENTS(name, gender, birth, dpi, phone, weight, blood, email, password) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement pst = this.transaction.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            pst.setString(1, p.getName());
+            pst.setBoolean(2, p.isGender());
+            pst.setDate(3, p.getBirth());
+            pst.setString(4, p.getDpi());
+            pst.setString(5, p.getPhone());
+            pst.setDouble(6, p.getWeight());
+            pst.setString(7, p.getBlood());
+            pst.setString(8, p.getEmail());
+            pst.setString(9, p.getPass());
+            pst.executeUpdate();
+            
+            ResultSet rs = pst.getGeneratedKeys();
+            if(rs.next()) {
+                id = rs.getInt(1);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        return id;
+    }
 }

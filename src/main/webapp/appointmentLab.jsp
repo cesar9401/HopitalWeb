@@ -59,7 +59,7 @@
             </div>
         </section>
 
-        <c:if test="${appointments != null}">
+        <c:if test="${appointmentsLab != null}">
             <section id="app-lab">
                 <div class="container">
                     <div class="row">
@@ -71,7 +71,7 @@
                                 <input type="hidden" id="date-exam" name="date-exam">
                                 <input type="hidden" id="exam-order" name="order">
                                 <div class="form-group row my-2 text-center">
-                                    <c:forEach var="a" items="${appointments}">
+                                    <c:forEach var="a" items="${appointmentsLab}">
                                         <div class="col-6">
                                             <div class="form-check form-control-lg">
                                                 <c:choose>

@@ -1,9 +1,11 @@
 package com.hospital.model;
 
 import com.hospital.controller.ReadXml;
+import java.io.UnsupportedEncodingException;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.servlet.http.HttpServletRequest;
 import org.jdom2.Element;
 
 /**
@@ -36,6 +38,14 @@ public class Patient extends Person {
         this.birth = rs.getDate("birth");
         this.weight = rs.getDouble("weight");
         this.blood = rs.getString("blood");
+    }
+    
+    public Patient(HttpServletRequest request) throws UnsupportedEncodingException {
+        super(request);
+        this.gender = request.getParameter("gender").equals("1");
+        this.birth = ReadXml.getDate(request.getParameter("date"));
+        this.weight = Double.parseDouble(request.getParameter("weight"));
+        this.blood = request.getParameter("blood");
     }
 
     public Patient(int patientId, boolean gender, Double weight, String blood, Double total) {

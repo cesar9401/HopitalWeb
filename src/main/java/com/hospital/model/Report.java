@@ -57,6 +57,7 @@ public class Report implements Serializable {
         
         this.patientName = rs.getString("patient");
         this.doctorName = rs.getString("doctor");
+        this.degree = rs.getString("kind");
     }
 
     public Report(HttpServletRequest request) throws UnsupportedEncodingException {

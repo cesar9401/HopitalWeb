@@ -1,6 +1,6 @@
 body{
     margin: 0;    
-    background-color: rgba(74, 189, 172);        
+    background-color: rgb(74, 189, 172);        
     font-size: 20px;    
 }
 main{
@@ -58,8 +58,8 @@ main{
 }
 
 .derecha .boton{
-    width: 100px;
-    height: 25px;
+    width: 150px;
+    height: 35px;
     margin-top: 10px;
     border-radius: 15px;
     border: none;

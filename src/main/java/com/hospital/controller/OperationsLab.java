@@ -120,7 +120,7 @@ public class OperationsLab extends HttpServlet {
      */
     private void newResultPatient(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Result result = new Result(request);
-        //resultDao.insertNewResult(result);
+        resultDao.insertNewResult(result);
         request.setAttribute("successResult", result.getPatientId());
         LabWorker labWorker = labDao.getLabWorkerById(result.getLabWorkerId());
         main.setProfileLabWorker(request, response, labWorker);
