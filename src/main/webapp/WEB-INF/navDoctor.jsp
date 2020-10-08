@@ -10,7 +10,7 @@
                     <a class="nav-link" href="#">Link1<span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#exams">Link2</a>
+                    <a class="nav-link" href="#">Link2</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Pricing</a>
@@ -20,8 +20,8 @@
                         Cuenta
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Historial Pacientes</a>
+                        <a class="dropdown-item" href="ReportOperation?action=doctor">Reportes</a>
                         <a class="dropdown-item" href="MainController?action=singOff">Cerrar Sesion</a>
                     </div>
                 </li>

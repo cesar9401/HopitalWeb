@@ -21,6 +21,7 @@ public class Patient extends Person {
     private String blood;
     
     private Double total;
+    private int quantity;
 
     public Patient(Element e) {
         super(e);
@@ -104,6 +105,14 @@ public class Patient extends Person {
         this.total = total;
     }
 
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+    
     @Override
     public String toString() {
         return super.toString() + "Patient{" + "patientId=" + patientId + ", gender=" + gender + ", birth=" + birth + ", weight=" + weight + ", blood=" + blood + '}';

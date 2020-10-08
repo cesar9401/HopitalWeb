@@ -11,8 +11,6 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
@@ -41,6 +39,8 @@ public class Result implements Serializable {
 
     private String doctorId;
     private boolean status;
+    
+    private int quantity;
 
     public Result(Element e) {
         //super(e);
@@ -108,6 +108,14 @@ public class Result implements Serializable {
         }
     }
 
+    public Result(Date date, String labWorkerId, int examId, String examName, int quantity) {
+        this.date = date;
+        this.labWorkerId = labWorkerId;
+        this.examId = examId;
+        this.examName = examName;
+        this.quantity = quantity;
+    }
+    
     public int getResultId() {
         return resultId;
     }
@@ -220,6 +228,14 @@ public class Result implements Serializable {
         this.status = status;
     }
 
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+    
     @Override
     public String toString() {
         return "Result{" + "resultId=" + resultId + ", appointmentLabId=" + appointmentLabId + ", patientId=" + patientId + ", date=" + date + ", time=" + time + ", labWorkerId=" + labWorkerId + ", examId=" + examId + ", orderResult=" + orderResult + ", reportResult=" + reportResult + '}';

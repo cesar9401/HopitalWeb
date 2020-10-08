@@ -400,7 +400,7 @@ public class MainController extends HttpServlet {
         request.getRequestDispatcher("labWorkerView.jsp").forward(request, response);
     }
 
-    private boolean timeToWork(java.sql.Date date, LabWorker labWorker) {
+    public boolean timeToWork(java.sql.Date date, LabWorker labWorker) {
         Day today = Day.Domingo;
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);

@@ -32,7 +32,7 @@ public class HospitalReport {
         List<Appointment> appointments = new ArrayList<>();
         String query = "SELECT a.*, d.name AS doctor_name, s.degree, p.name AS patient_name FROM APPOINTMENTS a INNER JOIN DOCTORS d ON a.doctor_id = d.doctor_id "
                 + "INNER JOIN SPECIALTIES s ON a.specialty_id = s.specialty_id INNER JOIN PATIENTS p ON a.patient_id = p.patient_id "
-                + "WHERE a.doctor_id = ? AND a.date BETWEEN ? AND ? ORDER BY time";
+                + "WHERE a.doctor_id = ? AND a.date BETWEEN ? AND ? ORDER BY date,time";
         try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setString(1, doctorId);
             pst.setDate(2, date1);
@@ -47,6 +47,90 @@ public class HospitalReport {
         return appointments;
     }
 
+    /**
+     * Medico -> Reporte de citas para el día en curso
+     *
+     * @param doctorId
+     * @param date
+     * @return
+     */
+    public List<Appointment> getAppointmentsByDoctorToday(String doctorId, java.sql.Date date) {
+        AppointmentDao aDao = new AppointmentDao(this.transaction);
+        return aDao.getAppointmentsByDoctor(doctorId, date, false);
+    }
+
+    /**
+     * Pacientes con mas reportes medicos en un intervalo de tiempo
+     * 
+     * @param date1
+     * @param date2
+     * @return 
+     */
+    public List<Patient> patientsWithMostReports(java.sql.Date date1, java.sql.Date date2) {
+        List<Patient> patients = new ArrayList<>();
+        String query = "SELECT p.*, COUNT(*) AS quantity FROM REPORTS r INNER JOIN PATIENTS p ON r.patient_id = p.patient_id "
+                + "WHERE r.date BETWEEN ? AND ? GROUP BY r.patient_id ORDER BY quantity DESC";
+        try {
+            PreparedStatement pst = this.transaction.prepareStatement(query);
+            pst.setDate(1, date1);
+            pst.setDate(2, date2);
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    Patient tmp = new Patient(rs);
+                    tmp.setQuantity(rs.getInt("quantity"));
+                    patients.add(tmp);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+
+        return patients;
+    }
+
+    /**
+     * Laboratorista -> Reporte de examenes a realizarse en su turno de día y a
+     * realizados
+     *
+     * @param examId
+     * @param date
+     * @return
+     */
+    public List<Appointment> getAppointmentLab(int examId, java.sql.Date date) {
+        AppointmentDao aDao = new AppointmentDao(this.transaction);
+        return aDao.getAppointmentLab(examId, date);
+    }
+
+    /**
+     * Laboratorista -> Reporte de las 10 fechas con más trabajo realizado
+     * @param labWorkerId
+     * @return 
+     */
+    public List<Result> get10DateMoreWork(String labWorkerId) {
+        List<Result> results = new ArrayList<>();
+        String query = "SELECT r.date, r.exam_id, e.name, r.lab_worker_id, COUNT(*) AS quantity FROM RESULTS r INNER JOIN EXAMS e ON r.exam_id = e.exam_id "
+                + " WHERE r.lab_worker_id = ? GROUP BY r.date ORDER BY quantity DESC LIMIT 10";
+        try {
+            PreparedStatement pst = this.transaction.prepareStatement(query);
+            pst.setString(1, labWorkerId);
+            try (ResultSet rs = pst.executeQuery()) {
+                while(rs.next()) {
+                    java.sql.Date date = rs.getDate("date");
+                    int examId = rs.getInt("exam_id");
+                    String examName = rs.getString("name");
+                    String labId = rs.getString("lab_worker_id");
+                    int quantity = rs.getInt("quantity");
+                    
+                    results.add(new Result(date, labId, examId, examName, quantity));
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        }
+        
+        return results;
+    }
+    
     /**
      * Paciente -> Ultimos 5 examenes de laboratorio realizados
      *
@@ -110,7 +194,7 @@ public class HospitalReport {
      */
     public List<Report> getLast5ReportsByPatient(int patientId) {
         List<Report> reports = new ArrayList<>();
-        String query = "SELECT r.*, p.name AS patient, d.name AS doctor FROM REPORTS r INNER JOIN PATIENTS p ON r.patient_id = p.patient_id INNER JOIN DOCTORS d ON r.doctor_id = d.doctor_id "
+        String query = "SELECT r.*, p.name AS patient, d.name AS doctor, s.degree AS kind FROM REPORTS r INNER JOIN PATIENTS p ON r.patient_id = p.patient_id INNER JOIN DOCTORS d ON r.doctor_id = d.doctor_id INNER JOIN APPOINTMENTS a ON r.appointment_id = a.appointment_id INNER JOIN SPECIALTIES s ON s.specialty_id = a.specialty_id "
                 + "WHERE r.patient_id = ? ORDER BY date, time LIMIT 5";
         try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setInt(1, patientId);
@@ -137,7 +221,7 @@ public class HospitalReport {
      */
     public List<Report> getReportsByDoctorAndTime(int patientId, String doctorId, java.sql.Date date1, java.sql.Date date2) {
         List<Report> reports = new ArrayList<>();
-        String query = "SELECT r.*, p.name AS patient, d.name AS doctor FROM REPORTS r INNER JOIN PATIENTS p ON r.patient_id = p.patient_id INNER JOIN DOCTORS d ON r.doctor_id = d.doctor_id "
+        String query = "SELECT r.*, p.name AS patient, d.name AS doctor, s.degree AS kind FROM REPORTS r INNER JOIN PATIENTS p ON r.patient_id = p.patient_id INNER JOIN DOCTORS d ON r.doctor_id = d.doctor_id INNER JOIN APPOINTMENTS a ON r.appointment_id = a.appointment_id INNER JOIN SPECIALTIES s ON s.specialty_id = a.specialty_id "
                 + "WHERE r.patient_id = ? AND r.doctor_id = ? AND r.date BETWEEN ? AND ? ORDER BY date, time";
         try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setInt(1, patientId);
@@ -242,11 +326,12 @@ public class HospitalReport {
     }
 
     /**
-     * Administrador -> Ingresos generados por paciente en un intervalo de tiempo
-     * 
+     * Administrador -> Ingresos generados por paciente en un intervalo de
+     * tiempo
+     *
      * @param date1
      * @param date2
-     * @return 
+     * @return
      */
     List<Patient> getPatientByIncome(java.sql.Date date1, java.sql.Date date2) {
         List<Patient> patients = new ArrayList<>();
@@ -263,10 +348,10 @@ public class HospitalReport {
                     double weight = rs.getDouble("weight");
                     String blood = rs.getString("blood");
                     Double total = rs.getDouble("total");
-                    
+
                     Patient tmp = new Patient(patientId, gender, weight, blood, total);
                     tmp.setName(name);
-                    
+
                     patients.add(tmp);
                 }
             }
