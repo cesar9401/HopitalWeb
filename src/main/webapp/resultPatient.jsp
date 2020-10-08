@@ -60,7 +60,7 @@
                                 <div class="form-group text-center">
                                     <div class="col">
                                         <label for="input-result">Resultado </label>
-                                        <input type="file" name="input-result" required>                                        
+                                        <input type="file" id="input-result" name="input-result" required>                                        
                                     </div>
                                 </div>
 
@@ -93,5 +93,15 @@
         </section>
 
         <%@include file="js.html" %>
+        <script type="text/javascript">
+            <c:choose>
+                <c:when test="${thisExam.report}">
+            $('#input-result').prop('accept', 'application/pdf');
+                </c:when>
+                <c:otherwise>
+            $('#input-result').prop('accept', 'image/jpeg,image/gif,image/png');
+                </c:otherwise>
+            </c:choose>
+        </script>
     </body>
 </html>

@@ -26,6 +26,7 @@ public class OperationsLab extends HttpServlet {
     private final PatientDao patientDao = new PatientDao(conexion);
     private final ResultDao resultDao = new ResultDao(conexion);
     private final LabWorkerDao labDao = new LabWorkerDao(conexion);
+    private final ExamDao examDao = new ExamDao(conexion);
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -67,13 +68,26 @@ public class OperationsLab extends HttpServlet {
             throws ServletException, IOException {
 
         String action = request.getParameter("action");
-        if (action.equals("file")) {
-            int appId = Integer.parseInt(request.getParameter("value"));
-            appointmentDao.getOrder(appId, response);
-        } else if (action.equals("result")) {
-            int appId = Integer.parseInt(request.getParameter("value"));
-            Appointment app = appointmentDao.getAppointmentById(appId, true);
-            setNewResult(request, response, app);
+        switch (action) {
+            case "file":
+                int appId = Integer.parseInt(request.getParameter("value"));
+                appointmentDao.getOrder(appId, response);
+                break;
+
+            case "result":
+                int appId1 = Integer.parseInt(request.getParameter("value"));
+                Appointment app = appointmentDao.getAppointmentById(appId1, true);
+                setNewResult(request, response, app);
+                break;
+                
+            case "getReport":
+                int resulId = Integer.parseInt(request.getParameter("value"));
+                int examId = Integer.parseInt(request.getParameter("exam"));
+                Exam exam = examDao.getExamById(examId);
+                resultDao.getReport(response, resulId, exam.isReport());
+                
+                
+                break;
         }
     }
 
@@ -85,9 +99,10 @@ public class OperationsLab extends HttpServlet {
      * @param app
      */
     private void setNewResult(HttpServletRequest request, HttpServletResponse response, Appointment app) throws ServletException, IOException {
-        //Exam exam = examDao.getExamById(app.getExamId());
+        Exam exam = examDao.getExamById(app.getExamId());
         Patient patient = patientDao.getPatientById(app.getPatientId());
         request.setAttribute("actualApp", app);
+        request.setAttribute("thisExam", exam);
         request.setAttribute("patient", patient);
         request.getRequestDispatcher("resultPatient.jsp").forward(request, response);
     }
@@ -113,10 +128,11 @@ public class OperationsLab extends HttpServlet {
     }
 
     /**
-     * Guardar nuevo resultado para paciente en la base de datos y redirigir al perfil del laboratorista
-     * 
+     * Guardar nuevo resultado para paciente en la base de datos y redirigir al
+     * perfil del laboratorista
+     *
      * @param request
-     * @param response 
+     * @param response
      */
     private void newResultPatient(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Result result = new Result(request);

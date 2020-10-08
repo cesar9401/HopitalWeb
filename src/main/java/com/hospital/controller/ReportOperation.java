@@ -73,23 +73,53 @@ public class ReportOperation extends HttpServlet {
                 request.getRequestDispatcher("doctorReports.jsp").forward(request, response);
                 break;
             case "lab":
-                LabWorker lab = (LabWorker) request.getSession().getAttribute("profile");
-                Exam exam = examDao.getExamById(lab.getExamId());
-                request.getSession().setAttribute("e", exam.getName());
-                labReport4(request, response);
-                request.getRequestDispatcher("labReports.jsp").forward(request, response);
+                setReportsLab(request, response);
                 break;
             case "patient":
-                List<Exam> exams = examDao.getExams(false);
-                List<Doctor> doctors = doctorDao.getDoctors();
-                request.getSession().setAttribute("examsPatient", exams);
-                request.getSession().setAttribute("doctorsPatient", doctors);
-                patientReport1(request, response);
-                patientReport3(request, response);
-                request.getRequestDispatcher("patientReports.jsp").forward(request, response);
+                setReportsPatient(request, response);
+
+                break;
+            case "admin":
+                setReportsAdmin(request, response);
                 break;
         }
 
+    }
+
+    /**
+     * Inicializar los reportes de lab
+     *
+     * @param request
+     * @param response
+     */
+    private void setReportsLab(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        LabWorker lab = (LabWorker) request.getSession().getAttribute("profile");
+        Exam exam = examDao.getExamById(lab.getExamId());
+        request.getSession().setAttribute("e", exam.getName());
+        labReport4(request, response);
+        request.getRequestDispatcher("labReports.jsp").forward(request, response);
+    }
+
+    /**
+     * Inicializar reportes de paciente
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
+    private void setReportsPatient(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        List<Exam> exams = examDao.getExams(false);
+        List<Doctor> doctors = doctorDao.getDoctors();
+        request.getSession().setAttribute("examsPatient", exams);
+        request.getSession().setAttribute("doctorsPatient", doctors);
+        patientReport1(request, response);
+        patientReport3(request, response);
+        request.getRequestDispatcher("patientReports.jsp").forward(request, response);
+    }
+
+    private void setReportsAdmin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("adminReports.jsp").forward(request, response);
     }
 
     /**
@@ -136,6 +166,17 @@ public class ReportOperation extends HttpServlet {
                 patientReport4(request, response);
                 break;
 
+            case "admin1":
+                adminReport1(request, response);
+                break;
+
+            case "admin2":
+                adminReport2(request, response);
+                break;
+
+            case "admin3":
+                adminReport3(request, response);
+                break;
         }
     }
 
@@ -207,7 +248,7 @@ public class ReportOperation extends HttpServlet {
     private void labReport4(HttpServletRequest request, HttpServletResponse response) {
         String labId = (String) request.getSession().getAttribute("user");
         List<Result> lab4 = hospital.get10DateMoreWork(labId);
-        request.setAttribute("lab4", lab4);
+        request.getSession().setAttribute("lab4", lab4);
     }
 
     private void patientReport1(HttpServletRequest request, HttpServletResponse response) {
@@ -249,4 +290,35 @@ public class ReportOperation extends HttpServlet {
         request.setAttribute("patient4", patient4);
         request.getRequestDispatcher("patientReports.jsp").forward(request, response);
     }
+
+    private void adminReport1(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        java.sql.Date date1 = ReadXml.getDate(request.getParameter("date1"));
+        java.sql.Date date2 = ReadXml.getDate(request.getParameter("date2"));
+        List<Report> admin1 = hospital.getTop10DoctorsReports(date1, date2);
+        request.setAttribute("date1", date1);
+        request.setAttribute("date2", date2);
+        request.setAttribute("admin1", admin1);
+        request.getRequestDispatcher("adminReports.jsp").forward(request, response);
+    }
+
+    private void adminReport2(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        java.sql.Date date3 = ReadXml.getDate(request.getParameter("date3"));
+        java.sql.Date date4 = ReadXml.getDate(request.getParameter("date4"));
+        List<Report> admin2 = hospital.getIncomesByDate(date3, date4);
+        request.setAttribute("date3", date3);
+        request.setAttribute("date4", date4);
+        request.setAttribute("admin2", admin2);
+        request.getRequestDispatcher("adminReports.jsp").forward(request, response);
+    }
+
+    private void adminReport3(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        java.sql.Date date5 = ReadXml.getDate(request.getParameter("date5"));
+        java.sql.Date date6 = ReadXml.getDate(request.getParameter("date6"));
+        List<Doctor> admin3 = hospital.getDoctorsFewerApp(date5, date6);
+        request.setAttribute("date5", date5);
+        request.setAttribute("date6", date6);
+        request.setAttribute("admin3", admin3);
+        request.getRequestDispatcher("adminReports.jsp").forward(request, response);
+    }
+
 }

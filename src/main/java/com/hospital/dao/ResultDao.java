@@ -2,6 +2,9 @@ package com.hospital.dao;
 
 import com.hospital.conexion.Conexion;
 import com.hospital.model.Result;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  *
@@ -109,18 +113,18 @@ public class ResultDao {
             pst.setDate(6, r.getDate());
             pst.setTime(7, r.getTime());
             pst.executeUpdate();
-            
+
             try (ResultSet rs = pst.getGeneratedKeys()) {
-                if(rs.next()) {
+                if (rs.next()) {
                     id = rs.getInt(1);
                 }
             }
-            
+
             pst = this.transaction.prepareStatement(queryIn);
             pst.setInt(1, id);
             pst.setInt(2, r.getExamId());
             pst.executeUpdate();
-            
+
             this.transaction.commit();
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
@@ -131,6 +135,31 @@ public class ResultDao {
             }
         } finally {
             Conexion.close(pst);
+        }
+    }
+
+    public void getReport(HttpServletResponse response, int resultId, boolean report) {
+        String query = "SELECT report FROM RESULTS WHERE result_id = ?";
+        if (report) {
+            response.setContentType("application/pdf");
+        } else {
+            response.setContentType("image/jpeg,image/gif,image/png");
+        }
+        InputStream inputStream = null;
+
+        try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
+            pst.setInt(1, resultId);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                     inputStream = new ByteArrayInputStream(rs.getBytes("report"));
+                }
+            }
+            byte[] data = new byte[inputStream.available()];
+            inputStream.read(data, 0, inputStream.available());
+            response.getOutputStream().write(data);
+            inputStream.close();
+        } catch (SQLException | IOException ex) {
+            ex.printStackTrace(System.out);
         }
     }
 }

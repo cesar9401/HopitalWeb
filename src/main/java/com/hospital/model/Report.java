@@ -64,7 +64,7 @@ public class Report implements Serializable {
         this.appointmentId = Integer.parseInt(request.getParameter("appointmentId"));
         this.patientId = Integer.parseInt(request.getParameter("patientId"));
         this.doctorId = request.getParameter("doctorId");
-        this.report = new String(request.getParameter("report").getBytes("ISO-8859-1"), "UTF-8");
+                this.report = new String(request.getParameter("report").getBytes("ISO-8859-1"), "UTF-8");
         this.date = ReadXml.getDate(request.getParameter("date"));
         this.time = ReadXml.getTime(request.getParameter("time"));
         

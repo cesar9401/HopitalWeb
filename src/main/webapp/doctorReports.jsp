@@ -235,8 +235,6 @@
             </div>
         </section>
 
-
-
         <%@include file="js.html" %>
         <script>
             window.onload = function () {

@@ -274,7 +274,7 @@ public class HospitalReport {
      */
     public List<Report> getIncomesByDate(java.sql.Date date1, java.sql.Date date2) {
         List<Report> reports = new ArrayList<>();
-        String query = "SELECT r.doctor_id AS doctor_id, d.name AS doctor_name, SUM(i.income) AS total FROM INCOMES i INNER JOIN REPORTS r ON i.report_id = r.report_id INNER JOIN DOCTORS d ON d.doctor_id = r.doctor_id "
+        String query = "SELECT d.doctor_id AS doctor_id, d.name AS doctor_name, SUM(i.income) AS total FROM INCOMES i INNER JOIN REPORTS r ON i.report_id = r.report_id INNER JOIN DOCTORS d ON d.doctor_id = r.doctor_id "
                 + "WHERE r.date BETWEEN ? AND ? GROUP BY doctor_id ORDER BY total DESC";
         try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setDate(1, date1);
@@ -300,8 +300,8 @@ public class HospitalReport {
      */
     public List<Doctor> getDoctorsFewerApp(java.sql.Date date1, java.sql.Date date2) {
         List<Doctor> doctors = new ArrayList<>();
-        String query = "SELECT a.doctor_id, d.name, COUNT(*) AS quantity, d.collegiate, d.start_time, d.end_time FROM APPOINTMENTS a INNER JOIN DOCTORS d ON a.doctor_id = d.doctor_id "
-                + "WHERE a.date BETWEEN = AND ? GROUP BY a.doctor_id ORDER BY quantity ASC, doctor_id LIMIT 5";
+        String query = "SELECT d.doctor_id, d.name, COUNT(a.doctor_id) AS quantity, d.collegiate, d.start_time, d.end_time FROM APPOINTMENTS a INNER JOIN DOCTORS d ON a.doctor_id = d.doctor_id "
+                + "WHERE a.date BETWEEN ? AND ? OR a.date IS NULL GROUP BY d.doctor_id ORDER BY quantity ASC, doctor_id LIMIT 5";
         try (PreparedStatement pst = this.transaction.prepareStatement(query)) {
             pst.setDate(1, date1);
             pst.setDate(2, date2);

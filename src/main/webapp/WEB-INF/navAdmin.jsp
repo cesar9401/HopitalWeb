@@ -23,8 +23,7 @@
                         Cuenta
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="ReportOperation?action=admin">Reportes</a>
                         <a class="dropdown-item" href="MainController?action=singOff">Cerrar Sesion</a>
                     </div>
                 </li>

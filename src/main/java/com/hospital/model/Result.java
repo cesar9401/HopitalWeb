@@ -79,7 +79,7 @@ public class Result implements Serializable {
         this.examId = rs.getInt("exam_id");
         this.labWorkerId = rs.getString("lab_worker_id");
         //this.orderResult = (InputStream) rs.getBlob("exam_order");
-        this.reportResult = (InputStream) rs.getBlob("report");
+        //this.reportResult = (InputStream) rs.getBlob("report");
         this.date = rs.getDate("date");
         this.time = rs.getTime("time");
 

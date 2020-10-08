@@ -100,7 +100,7 @@
                                 <td><span class="badge badge-warning">${rep.degree}</span></td>
                                 <td>${rep.time}</td>
                                 <td>${rep.date}</td>
-                                <td><a href="#" class="btn btn-outline-info">Ver más</a></td>
+                                <td><a href="#" onclick="setInfo('${rep.report}')" class="btn btn-outline-info" data-toggle="modal" data-target="#modalInfo">Ver más</a></td>
                             </tr>
                         </c:forEach>
                         <c:forEach var="res" items="${results}">
@@ -110,13 +110,33 @@
                                 <td><span class="badge badge-info">${res.examName}</span></td>
                                 <td>${res.time}</td>
                                 <td>${res.date}</td>
-                                <td><a href="#" class="btn btn-outline-info">Ver más</a></td>
+                                <td><a href="OperationsLab?action=getReport&value=${res.resultId}&exam=${res.examId}" class="btn btn-danger btn-sm" target="_blank">Resultado</a></td>
                             </tr>
                         </c:forEach>   
                     </tbody>
                 </table>
             </div>
         </section>
+
+        <!--Moda para mostrar informe medico-->
+        <div class="modal fade" id="modalInfo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-center" id="exampleModalLabel">Reporte Médico</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="modal-info">Reporte</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Modal para confirmar registro en el sistema-->
         <div class="modal fade" id="modal-patient" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -138,15 +158,21 @@
             </div>
         </div>
 
+        <script>
+            var setInfo = function (report) {
+                var info = document.getElementById('modal-info');
+                info.textContent = report.toString();
+            };
+        </script>
         <%@include file="js.html"%>
         <script src="js/Sorttable.js"></script>
         <c:if test="${success != null}">
             <script>
-                var p = document.getElementById('info-modal-patient');
-                p.textContent = "Bienvenido al Hospital Pasteur ${success}";
-                $(document).ready(function () {
-                    $('#modal-patient').modal('show');
-                });
+                    var p = document.getElementById('info-modal-patient');
+                    p.textContent = "Bienvenido al Hospital Pasteur ${success}";
+                    $(document).ready(function () {
+                        $('#modal-patient').modal('show');
+                    });
             </script>
         </c:if>
     </body>
